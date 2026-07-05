@@ -1,5 +1,3 @@
--- Copyright Epic Games, Inc. All Rights Reserved.
--- CONTAINS AI GENERATED CODE
 local M = {}
 
 local config = require("neovide.config")

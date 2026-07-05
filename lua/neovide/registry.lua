@@ -1,5 +1,3 @@
--- Copyright Epic Games, Inc. All Rights Reserved.
--- CONTAINS AI GENERATED CODE
 local platform = require("neovide.platform")
 
 local M = {}
@@ -950,9 +948,7 @@ end
 function M.is_valid(setting, value)
   local t = setting.type
   if t == "enum" then
-    return type(value) == "string"
-      and setting.choices ~= nil
-      and vim.tbl_contains(setting.choices, value)
+    return type(value) == "string" and setting.choices ~= nil and vim.tbl_contains(setting.choices, value)
   elseif t == "boolean" then
     return type(value) == "boolean"
   elseif t == "float" or t == "integer" then

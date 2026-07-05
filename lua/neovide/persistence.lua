@@ -1,5 +1,3 @@
--- Copyright Epic Games, Inc. All Rights Reserved.
--- CONTAINS AI GENERATED CODE
 local M = {}
 
 local config = require("neovide.config")
@@ -89,10 +87,7 @@ function M.apply_saved()
   end
 
   if #coerced > 0 then
-    vim.notify(
-      "neovide.nvim: ignored invalid saved value(s): " .. table.concat(coerced, ", "),
-      vim.log.levels.WARN
-    )
+    vim.notify("neovide.nvim: ignored invalid saved value(s): " .. table.concat(coerced, ", "), vim.log.levels.WARN)
   end
 end
 

@@ -1,5 +1,3 @@
--- Copyright Epic Games, Inc. All Rights Reserved.
--- CONTAINS AI GENERATED CODE
 local Float = require("neovide.float")
 local State = require("neovide.state")
 local render = require("neovide.render")

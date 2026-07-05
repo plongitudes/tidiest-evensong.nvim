@@ -1,5 +1,3 @@
--- Copyright Epic Games, Inc. All Rights Reserved.
--- CONTAINS AI GENERATED CODE
 if vim.g.loaded_neovide_nvim then
   return
 end
