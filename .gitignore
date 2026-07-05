@@ -1,0 +1,15 @@
+# Vim/Neovim temporary files
+*.sw[a-p]
+*~
+.*.swp
+.*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor directories
+.vscode/
+.idea/
+.claude/
