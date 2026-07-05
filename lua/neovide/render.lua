@@ -10,6 +10,29 @@ local M = {}
 -- Each entry: { type = "category"|"setting"|"header"|"blank", key = string?, category = string? }
 M.locations = {}
 
+-- Width of the label column, so every setting's value/slider starts at the same x.
+-- Computed once from the widest display_name across the registry (+ a small gap).
+local NAME_GAP = 2
+local name_col_cache = nil
+local function name_col()
+  if not name_col_cache then
+    local maxw = 0
+    for _, s in ipairs(registry.settings) do
+      local w = vim.fn.strdisplaywidth(s.display_name)
+      if w > maxw then
+        maxw = w
+      end
+    end
+    name_col_cache = maxw + NAME_GAP
+  end
+  return name_col_cache
+end
+
+-- Spaces needed to pad `name` out to the label column.
+local function name_pad(name)
+  return string.rep(" ", math.max(name_col() - vim.fn.strdisplaywidth(name), 1))
+end
+
 function M.build(state, buf)
   local text = Text.new()
   M.locations = {}
@@ -113,7 +136,7 @@ function M._setting_row(text, state, setting)
   if not available then
     -- Dimmed unavailable setting
     text:append(setting.display_name, "NeovideDimmed")
-    text:append("  ", "NeovideDimmed")
+    text:append(name_pad(setting.display_name), "NeovideDimmed")
     local reason = platform_mod.unavailable_reason(setting)
     if reason then
       text:append("[" .. reason .. "]", "NeovideBadgeUnavailable")
@@ -125,7 +148,7 @@ function M._setting_row(text, state, setting)
 
   -- Setting name
   text:append(setting.display_name, "NeovideSettingName")
-  text:append("  ", "NeovideNormal")
+  text:append(name_pad(setting.display_name), "NeovideNormal")
 
   -- Type-specific value rendering
   if setting.type == "boolean" then
@@ -158,35 +181,34 @@ function M._render_bool(text, value, cfg)
   end
 end
 
+-- Slider bar. Uses the lower-half block (▄) rather than the full block (█) so the
+-- bar sits in the bottom of the line, leaving a half-line gap above it — this keeps
+-- vertically-stacked sliders from fusing into one solid mass, without an extra line.
+local BAR_WIDTH = 20
+local BAR_GLYPH = "▄"
+
+function M._slider(text, value, min, max)
+  local range = max - min
+  local ratio = range > 0 and (value - min) / range or 0
+  ratio = util.clamp(ratio, 0, 1)
+  local filled = math.floor(ratio * BAR_WIDTH + 0.5)
+  local empty = BAR_WIDTH - filled
+
+  text:append(string.rep(BAR_GLYPH, filled), "NeovideSliderFilled")
+  text:append(string.rep(BAR_GLYPH, empty), "NeovideSliderEmpty")
+  text:append(" ", "NeovideNormal")
+end
+
 function M._render_float(text, value, setting)
   if setting.min ~= nil and setting.max ~= nil then
-    -- Slider bar
-    local bar_width = 20
-    local range = setting.max - setting.min
-    local ratio = range > 0 and (value - setting.min) / range or 0
-    ratio = util.clamp(ratio, 0, 1)
-    local filled = math.floor(ratio * bar_width + 0.5)
-    local empty = bar_width - filled
-
-    text:append(string.rep("█", filled), "NeovideSliderFilled")
-    text:append(string.rep("░", empty), "NeovideSliderEmpty")
-    text:append(" ", "NeovideNormal")
+    M._slider(text, value, setting.min, setting.max)
   end
   text:append(tostring(util.round(value, 3)), "NeovideNumberValue")
 end
 
 function M._render_integer(text, value, setting)
   if setting.min ~= nil and setting.max ~= nil then
-    local bar_width = 20
-    local range = setting.max - setting.min
-    local ratio = range > 0 and (value - setting.min) / range or 0
-    ratio = util.clamp(ratio, 0, 1)
-    local filled = math.floor(ratio * bar_width + 0.5)
-    local empty = bar_width - filled
-
-    text:append(string.rep("█", filled), "NeovideSliderFilled")
-    text:append(string.rep("░", empty), "NeovideSliderEmpty")
-    text:append(" ", "NeovideNormal")
+    M._slider(text, value, setting.min, setting.max)
   end
   text:append(tostring(value), "NeovideNumberValue")
 end

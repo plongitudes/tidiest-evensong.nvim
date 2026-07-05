@@ -13,10 +13,6 @@ through `vim.g.neovide_*` globals or restarting to see what a value does.
 - Floating settings UI grouped by category (Display, Animation, Cursor, Window, …).
 - Live-apply of runtime settings; changes take effect as you edit.
 - Persistence to `stdpath("data")/neovide.nvim/settings.lua`, re-applied on startup.
-- **Validation on the persistence boundary** — an invalid saved value (e.g. an unset
-  `theme` captured as `""`) is coerced back to its default instead of being handed to
-  Neovide, which avoids startup errors like
-  `Setting Theme expected one of auto, dark, light, bg_color, but received ""`.
 - Named profiles you can save and re-apply.
 - Reads a subset of settings from Neovide's startup `config.toml`.
 
