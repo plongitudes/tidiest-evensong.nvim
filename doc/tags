@@ -1,0 +1,11 @@
+:Neovide	neovide.txt	/*:Neovide*
+neovide-commands	neovide.txt	/*neovide-commands*
+neovide-contents	neovide.txt	/*neovide-contents*
+neovide-development	neovide.txt	/*neovide-development*
+neovide-introduction	neovide.txt	/*neovide-introduction*
+neovide-keymaps	neovide.txt	/*neovide-keymaps*
+neovide-persistence	neovide.txt	/*neovide-persistence*
+neovide-requirements	neovide.txt	/*neovide-requirements*
+neovide-setup	neovide.txt	/*neovide-setup*
+neovide-setup-options	neovide.txt	/*neovide-setup-options*
+neovide.txt	neovide.txt	/*neovide.txt*
