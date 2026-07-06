@@ -12,6 +12,9 @@ through `vim.g.neovide_*` globals or restarting to see what a value does.
 
 - Floating settings UI grouped by category (Display, Animation, Cursor, Window, …).
 - Live-apply of runtime settings; changes take effect as you edit.
+- Live-preview font picker for `guifont` — browse installed monospace fonts (via
+  fontconfig) and see each applied to the editor as you move; `<CR>` keeps it and
+  prompts for a point size, `c` drops to free-form input, `<Esc>` restores the original.
 - Persistence to `stdpath("data")/neovide.nvim/settings.lua`, re-applied on startup.
 - Named profiles you can save and re-apply.
 - Reads a subset of settings from Neovide's startup `config.toml`.
@@ -81,19 +84,25 @@ Or from Lua: `require("neovide").open()`, `.close()`, `.toggle()`.
 
 | Key            | Action                          |
 | -------------- | ------------------------------- |
-| `q` / `<Esc>`  | Close (saves if dirty)          |
-| `<CR>`         | Toggle category fold            |
-| `l` / `h`      | Increment / decrement value     |
-| `e`            | Edit value (free-form input)    |
-| `r`            | Reset to your default           |
-| `R`            | Reset to factory default        |
-| `a`            | Apply (save to disk)            |
+| `<CR>`         | Activate — fold section · toggle bool · cycle enum · edit value |
+| `l` / `h`      | Expand / collapse section; on a setting, increment / decrement value |
+| `}` / `{`      | Next / previous section (also `]]` / `[[`) |
+| `gg` / `G`     | Jump to top / bottom            |
+| `r` / `R`      | Reset to your / factory default |
+| `a`            | Apply — save changes to disk    |
 | `S`            | Save current values as a profile|
-| `L`            | Profiles view                   |
-| `}` / `{`      | Next / previous category        |
-| `?`            | Help view                       |
+| `L` / `?`      | Profiles view / help            |
+| `q` / `<Esc>`  | Close & discard unsaved changes |
 
-All keys are configurable via the `keys` table in `setup()`.
+All keys are configurable via the `keys` table in `setup()`. `<CR>` is the single
+"activate this row" key: it folds a section, toggles a boolean, cycles an enum, or edits
+any other value type. The description of the focused setting is shown in the window's
+top bar as you move.
+
+Changes **preview live** as you edit, but are only **persisted when you Apply** (`a`).
+Closing with `q`/`<Esc>` reverts every change you haven't applied — back to how things
+were when you opened the menu (or your last Apply) — so you never have to hunt for each
+setting's original value.
 
 ## Development
 

@@ -283,34 +283,91 @@ function M._help(text)
   local cfg = config.get()
   local keys = cfg.keys
 
-  text:append("  Keybindings", "NeovideCategory")
-  M._push_loc("header")
-  text:nl()
-  text:nl()
-  M._push_loc("blank")
+  local close_key = type(keys.close) == "table" and table.concat(keys.close, " / ") or keys.close
 
-  local bindings = {
-    { key = "j / k", desc = "Navigate settings" },
-    { key = "{ / }", desc = "Jump between categories" },
-    { key = keys.toggle_category, desc = "Toggle category / toggle boolean / cycle enum" },
-    { key = keys.increment .. " / " .. keys.decrement, desc = "Increment / decrement value" },
-    { key = keys.edit, desc = "Edit value (free-form input)" },
-    { key = keys.reset, desc = "Reset to my defaults" },
-    { key = keys.reset_factory, desc = "Reset to factory defaults" },
-    { key = keys.apply, desc = "Save settings to disk" },
-    { key = keys.save_profile, desc = "Save as profile" },
-    { key = keys.profiles_view, desc = "View profiles" },
-    { key = keys.help_view, desc = "Toggle help" },
-    { key = type(keys.close) == "table" and table.concat(keys.close, " / ") or keys.close, desc = "Close" },
-  }
-
-  for _, b in ipairs(bindings) do
-    text:append("    ", "NeovideNormal")
-    text:append(string.format("%-12s", b.key), "NeovideKey")
-    text:append("  " .. b.desc, "NeovideNormal")
+  -- Every helper emits exactly one line (append… → push → nl) so locations stay aligned.
+  local function heading(str)
+    text:append("  " .. str, "NeovideCategory")
     M._push_loc("help")
     text:nl()
   end
+  local function row(key, desc)
+    text:append("    ", "NeovideNormal")
+    text:append(string.format("%-11s", key), "NeovideKey")
+    text:append("  " .. desc, "NeovideNormal")
+    M._push_loc("help")
+    text:nl()
+  end
+  local function raw(fn)
+    fn()
+    M._push_loc("help")
+    text:nl()
+  end
+  local function blank()
+    M._push_loc("blank")
+    text:nl()
+  end
+
+  raw(function()
+    text:append("  ", "NeovideNormal")
+    text:append(" Neovide Settings ", "NeovideH1")
+  end)
+  raw(function()
+    text:append("  In-editor manager for Neovide's runtime settings.", "NeovideDimmed")
+  end)
+  blank()
+
+  heading("Navigation")
+  row("j / k", "Move down / up")
+  row("{ / }", "Previous / next section  (also [[ / ]])")
+  row("gg / G", "Jump to top / bottom")
+  blank()
+
+  heading("Editing")
+  row(keys.toggle_category, "Activate — fold section · toggle bool · cycle enum · edit value")
+  row(keys.decrement .. " / " .. keys.increment, "Collapse / expand section · decrease / increase value")
+  row(keys.reset .. " / " .. keys.reset_factory, "Reset to my / factory default")
+  blank()
+
+  heading("Session")
+  row(keys.apply, "Apply — save changes to disk")
+  row(keys.save_profile, "Save current values as a profile")
+  row(keys.profiles_view .. " / " .. keys.help_view, "Profiles view / toggle this help")
+  row(close_key, "Close & discard unsaved changes")
+  blank()
+
+  heading("Legend")
+  raw(function()
+    text:append("    ", "NeovideNormal")
+    text:append(string.rep("▄", 5), "NeovideSliderFilled")
+    text:append(string.rep("▄", 3), "NeovideSliderEmpty")
+    text:append("   slider — the filled portion is the current value", "NeovideDimmed")
+  end)
+  local badges = {
+    { "[restart]", "NeovideBadgeRestart", "setting needs a Neovide restart to take effect" },
+    { "[nightly]", "NeovideBadgeNightly", "requires a Neovide nightly build" },
+    { "[macos]", "NeovideBadgePlatform", "platform-specific (also [windows] / [linux])" },
+    { "[modified]", "NeovideBadgeModified", "changed but not yet applied" },
+  }
+  for _, b in ipairs(badges) do
+    raw(function()
+      text:append("    ", "NeovideNormal")
+      text:append(string.format("%-11s", b[1]), b[2])
+      text:append("  " .. b[3], "NeovideDimmed")
+    end)
+  end
+  raw(function()
+    text:append("    ", "NeovideNormal")
+    text:append(string.format("%-11s", "(not set)"), "NeovideDimmed")
+    text:append("  no value assigned", "NeovideDimmed")
+  end)
+  blank()
+
+  raw(function()
+    text:append("  See ", "NeovideDimmed")
+    text:append(":help neovide", "NeovideKey")
+    text:append("  ·  github.com/plongitudes/tidiest-evensong.nvim", "NeovideDimmed")
+  end)
 end
 
 function M._push_loc(loc_type, key, category)

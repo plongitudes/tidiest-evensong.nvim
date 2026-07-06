@@ -86,17 +86,30 @@ Lua API: >
 Default keymaps active inside the settings UI (all configurable via the `keys`
 table in |neovide-setup|):
 
-    q / <Esc>     Close (saves if there are unsaved changes)
-    <CR>          Toggle category fold
-    l / h         Increment / decrement the current value
-    e             Edit value with free-form input
-    r             Reset to your default
-    R             Reset to factory default
-    a             Apply (save to disk)
+    <CR>          Activate the current row: fold a section, toggle a boolean,
+                  cycle an enum, or edit any other value type. Font settings
+                  open a live-preview picker of installed monospace families
+                  (each applied as you move; <CR> keeps it and prompts for a
+                  point size, c = free-form input, <Esc> restores).
+    l / h         Expand / collapse a section; on a setting, increment /
+                  decrement the current value
+    } / {         Next / previous section (also ]] / [[). From a setting, {
+                  goes to the current section header; from a header, to the
+                  previous one.
+    gg / G        Jump to top / bottom
+    r / R         Reset to your / factory default
+    a             Apply — save changes to disk
     S             Save current values as a named profile
     L             Open the profiles view
-    } / {         Next / previous category
     ?             Open the help view
+    q / <Esc>     Close, discarding any unsaved (un-applied) changes
+
+The description of the focused setting is shown in the window's top bar and
+updates as the cursor moves.
+
+Changes preview live as you edit but are only persisted when you Apply (a).
+Closing with q / <Esc> reverts every change you have not applied, back to how
+things were when the menu opened (or your last Apply).
 
 ==============================================================================
 6. PERSISTENCE                                            *neovide-persistence*

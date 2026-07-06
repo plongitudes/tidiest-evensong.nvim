@@ -3,6 +3,10 @@ local config = require("neovide.config")
 local M = {}
 M.__index = M
 
+-- Monotonic id so each Float gets its own autocmd group; otherwise a nested float
+-- (e.g. the font picker over the settings UI) would clear the parent's autocmds.
+local _instance = 0
+
 function M.new(opts)
   local self = setmetatable({}, M)
   self.opts = opts or {}
@@ -10,7 +14,8 @@ function M.new(opts)
   self.buf = nil
   self.backdrop_win = nil
   self.backdrop_buf = nil
-  self.augroup = vim.api.nvim_create_augroup("neovide_float", { clear = true })
+  _instance = _instance + 1
+  self.augroup = vim.api.nvim_create_augroup("neovide_float_" .. _instance, { clear = true })
   return self
 end
 
@@ -38,7 +43,8 @@ function M:open()
   -- Create main window
   self.win = vim.api.nvim_open_win(self.buf, true, win_config)
 
-  vim.wo[self.win].winhighlight = "Normal:NeovideNormal,FloatBorder:NeovideBorder"
+  vim.wo[self.win].winhighlight =
+    "Normal:NeovideNormal,FloatBorder:NeovideBorder,WinBar:NeovideNormal,WinBarNC:NeovideNormal"
   vim.wo[self.win].cursorline = true
   vim.wo[self.win].wrap = false
   vim.wo[self.win].signcolumn = "no"
@@ -91,14 +97,16 @@ function M:_win_config()
     style = "minimal",
     border = cfg.border,
     zindex = 50,
-    title = " Neovide Settings ",
+    title = self.opts.title or " Neovide Settings ",
     title_pos = "center",
   }
 end
 
 function M:_create_backdrop(win_config)
   local cfg = config.get()
-  if cfg.backdrop <= 0 then
+  -- Nested floats (opts.backdrop == false) skip their own backdrop to avoid
+  -- double-dimming over a parent float that already drew one.
+  if cfg.backdrop <= 0 or self.opts.backdrop == false then
     return
   end
 
