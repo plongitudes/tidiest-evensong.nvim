@@ -65,15 +65,10 @@ function M.apply_saved()
   -- Apply a single value, coercing to the registry default if it fails validation
   -- (so a dirty persisted value like theme = "" can never reach vim.g).
   local function apply(key, value)
-    local setting = registry.get(key)
-    if not setting then
-      return
+    local setting, val = registry.coerce_value(key, value, coerced)
+    if setting then
+      registry.write_value(setting, val)
     end
-    if not registry.is_valid(setting, value) then
-      table.insert(coerced, key)
-      value = setting.default
-    end
-    registry.write_value(setting, value)
   end
 
   -- Layer 2: apply user-declared defaults

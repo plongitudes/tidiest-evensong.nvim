@@ -547,15 +547,20 @@ function M._apply_profile(name)
     vim.notify("Profile not found: " .. name, vim.log.levels.WARN)
     return
   end
-  -- Apply profile settings
+  -- Apply profile settings, coercing any invalid value to its registry default so a
+  -- stale/hand-edited profile (e.g. theme = "") can't reach vim.g and crash Neovide.
+  local coerced = {}
   for key, value in pairs(profile.settings or {}) do
-    local setting = registry.get(key)
+    local setting, val = registry.coerce_value(key, value, coerced)
     if setting then
-      state:set_value(key, value)
+      state:set_value(key, val)
       if config.get().auto_apply and setting.source ~= "toml" then
-        registry.write_value(setting, value)
+        registry.write_value(setting, val)
       end
     end
+  end
+  if #coerced > 0 then
+    vim.notify("neovide.nvim: ignored invalid profile value(s): " .. table.concat(coerced, ", "), vim.log.levels.WARN)
   end
   vim.notify("Profile '" .. name .. "' applied", vim.log.levels.INFO)
   state.mode = "settings"

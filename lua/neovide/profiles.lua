@@ -39,11 +39,12 @@ function M.save(name, settings, desc)
   local dir = profiles_dir()
   util.ensure_dir(dir)
 
-  -- Only snapshot runtime settings (not TOML)
+  -- Only snapshot runtime settings (not TOML), and never bake an invalid value
+  -- into a profile file (a profile with theme = "" would crash Neovide on load).
   local to_save = {}
   for key, value in pairs(settings) do
     local setting = registry.get(key)
-    if setting and setting.source ~= "toml" then
+    if setting and setting.source ~= "toml" and registry.is_valid(setting, value) then
       to_save[key] = value
     end
   end
@@ -75,11 +76,15 @@ function M.apply(profile)
   if not profile or not profile.settings then
     return
   end
+  local coerced = {}
   for key, value in pairs(profile.settings) do
-    local setting = registry.get(key)
+    local setting, val = registry.coerce_value(key, value, coerced)
     if setting then
-      registry.write_value(setting, value)
+      registry.write_value(setting, val)
     end
+  end
+  if #coerced > 0 then
+    vim.notify("neovide.nvim: ignored invalid profile value(s): " .. table.concat(coerced, ", "), vim.log.levels.WARN)
   end
 end
 

@@ -1007,4 +1007,27 @@ function M.write_value(setting, value)
   end
 end
 
+--- Resolve a key to its setting and a validated value, coercing invalid values to
+--- the registry default so junk (e.g. theme = "" from a stale/hand-edited profile or
+--- settings.lua) can never reach vim.g. When `coerced` (a list) is supplied, the key
+--- is appended on coercion so the caller can emit a single aggregated warning.
+--- Returns nil for an unknown key.
+---@param key string
+---@param value any
+---@param coerced string[]|nil
+---@return NeovideSetting|nil setting, any value
+function M.coerce_value(key, value, coerced)
+  local setting = M._by_key[key]
+  if not setting then
+    return nil
+  end
+  if not M.is_valid(setting, value) then
+    if coerced then
+      table.insert(coerced, key)
+    end
+    value = setting.default
+  end
+  return setting, value
+end
+
 return M
