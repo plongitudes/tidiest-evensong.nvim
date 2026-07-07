@@ -1,5 +1,8 @@
 # tidiest-evensong.nvim
 
+![screenshot-1](./resources/settings_001.png)
+![screenshot-2](./resources/settings_002.png)
+
 ## What is Tidiest Evensong?
 
 An in-editor settings manager for [Neovide](https://neovide.dev/). Browse, tweak, and persist Neovide-specific runtime settings from a floating UI inside Neovide — no more hunting through `vim.g.neovide_*` globals or restarting to see what a value does.
