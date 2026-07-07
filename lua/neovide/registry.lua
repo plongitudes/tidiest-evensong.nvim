@@ -952,7 +952,18 @@ function M.is_valid(setting, value)
   elseif t == "boolean" then
     return type(value) == "boolean"
   elseif t == "float" or t == "integer" then
-    return type(value) == "number"
+    if type(value) ~= "number" then
+      return false
+    end
+    -- Reject out-of-range numbers when the setting declares bounds, so a corrupt
+    -- opacity = 999.0 can't reach vim.g / be persisted.
+    if setting.min ~= nil and value < setting.min then
+      return false
+    end
+    if setting.max ~= nil and value > setting.max then
+      return false
+    end
+    return true
   elseif t == "string" or t == "color" or t == "font" then
     return type(value) == "string"
   end
@@ -1001,7 +1012,9 @@ function M.read_value(setting)
           return setting.default
         end
       end
-      if node ~= nil then
+      -- Validate like the runtime branch: an invalid enum/out-of-range number in
+      -- config.toml must not flow unvalidated into the UI and back to disk.
+      if node ~= nil and M.is_valid(setting, node) then
         return node
       end
     end

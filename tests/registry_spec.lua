@@ -33,6 +33,14 @@ describe("registry.is_valid", function()
     assert.is_true(registry.is_valid(blurred, true))
     assert.is_false(registry.is_valid(blurred, "yes"))
   end)
+
+  it("range-checks numbers against declared min/max", function()
+    -- opacity is bounded 0.0..1.0; boundaries are valid, outside is not.
+    assert.is_true(registry.is_valid(opacity, 0.0))
+    assert.is_true(registry.is_valid(opacity, 1.0))
+    assert.is_false(registry.is_valid(opacity, 999.0))
+    assert.is_false(registry.is_valid(opacity, -0.5))
+  end)
 end)
 
 describe("registry theme choices", function()
@@ -64,5 +72,44 @@ describe("registry.read_value capture", function()
   it("returns a valid value unchanged", function()
     vim.g[theme.var_name] = "dark"
     assert.are.equal("dark", registry.read_value(theme))
+  end)
+end)
+
+describe("registry.read_value from TOML", function()
+  local frame = registry.get("toml_frame")
+  local size = registry.get("toml_font_size")
+  local tmpdir, config_path
+
+  local function write(content)
+    local f = assert(io.open(config_path, "w"))
+    f:write(content)
+    f:close()
+  end
+
+  before_each(function()
+    tmpdir = vim.fn.tempname()
+    vim.fn.mkdir(tmpdir, "p")
+    config_path = tmpdir .. "/config.toml"
+    vim.env.NEOVIDE_CONFIG = config_path
+  end)
+
+  after_each(function()
+    vim.fn.delete(tmpdir, "rf")
+    vim.env.NEOVIDE_CONFIG = nil
+  end)
+
+  it("falls back to default on an invalid enum in config.toml", function()
+    write('frame = "bogus"\n')
+    assert.are.equal("full", registry.read_value(frame))
+  end)
+
+  it("returns a valid enum from config.toml unchanged", function()
+    write('frame = "none"\n')
+    assert.are.equal("none", registry.read_value(frame))
+  end)
+
+  it("falls back to default on an out-of-range number in config.toml", function()
+    write("[font]\nsize = 999.0\n")
+    assert.are.equal(14.0, registry.read_value(size))
   end)
 end)
