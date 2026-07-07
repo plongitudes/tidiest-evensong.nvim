@@ -1,0 +1,15 @@
+local util = require("neovide.util")
+
+describe("util.round", function()
+  it("rounds half away from zero, symmetrically for negatives", function()
+    assert.are.equal(0.2, util.round(0.15, 1))
+    assert.are.equal(-0.2, util.round(-0.15, 1))
+    assert.are.equal(1, util.round(0.5, 0))
+    assert.are.equal(-1, util.round(-0.5, 0))
+  end)
+
+  it("leaves already-rounded values unchanged", function()
+    assert.are.equal(0.1, util.round(0.1, 1))
+    assert.are.equal(-0.3, util.round(-0.3, 1))
+  end)
+end)

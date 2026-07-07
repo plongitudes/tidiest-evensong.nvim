@@ -1042,19 +1042,20 @@ end
 ---@param key string
 ---@param value any
 ---@param coerced string[]|nil
----@return NeovideSetting|nil setting, any value
+---@return NeovideSetting|nil setting, any value, boolean was_coerced
 function M.coerce_value(key, value, coerced)
   local setting = M._by_key[key]
   if not setting then
     return nil
   end
-  if not M.is_valid(setting, value) then
+  local was_coerced = not M.is_valid(setting, value)
+  if was_coerced then
     if coerced then
       table.insert(coerced, key)
     end
     value = setting.default
   end
-  return setting, value
+  return setting, value, was_coerced
 end
 
 return M

@@ -70,6 +70,25 @@ describe("persistence with a dirty state file", function()
     assert.is_true(ok)
   end)
 
+  it("does not report a key as ignored when a later layer supplies a valid value", function()
+    -- Layer 2 (user default) is invalid, Layer 3 (saved) is valid: the key ends up
+    -- good, so it must not appear in the coerced warning.
+    config.setup({ data_path = tmpdir, settings = { theme = "" } })
+    write_file(settings_path, 'return { theme = "dark" }\n')
+    local warnings = {}
+    local orig_notify = vim.notify
+    vim.notify = function(msg)
+      table.insert(warnings, msg)
+    end
+    local ok = pcall(persistence.apply_saved)
+    vim.notify = orig_notify
+    assert.is_true(ok)
+    assert.are.equal("dark", vim.g.neovide_theme)
+    for _, m in ipairs(warnings) do
+      assert.is_nil(m:match("ignored invalid"))
+    end
+  end)
+
   it("round-trips a saved value through an atomic write", function()
     persistence.save({ theme = "light" })
     -- The temp file used during the atomic write must not linger.

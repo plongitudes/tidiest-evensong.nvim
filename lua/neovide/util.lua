@@ -13,6 +13,11 @@ end
 function M.round(value, decimals)
   decimals = decimals or 0
   local mult = 10 ^ decimals
+  -- Round half away from zero so negatives round symmetrically with positives
+  -- (e.g. -0.15 -> -0.2, matching 0.15 -> 0.2) rather than toward positive infinity.
+  if value < 0 then
+    return -math.floor(-value * mult + 0.5) / mult
+  end
   return math.floor(value * mult + 0.5) / mult
 end
 

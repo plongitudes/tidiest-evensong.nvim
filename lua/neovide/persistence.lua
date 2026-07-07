@@ -60,13 +60,17 @@ end
 
 function M.apply_saved()
   local registry = require("neovide.registry")
+  -- Track coercion per key (not as a flat list): a later layer applying a *valid*
+  -- value for the same key clears an earlier layer's coercion, so we never warn
+  -- about a key that ends up with a good value.
   local coerced = {}
 
   -- Apply a single value, coercing to the registry default if it fails validation
   -- (so a dirty persisted value like theme = "" can never reach vim.g).
   local function apply(key, value)
-    local setting, val = registry.coerce_value(key, value, coerced)
+    local setting, val, was_coerced = registry.coerce_value(key, value)
     if setting then
+      coerced[key] = was_coerced or nil
       registry.write_value(setting, val)
     end
   end
@@ -81,8 +85,10 @@ function M.apply_saved()
     apply(key, value)
   end
 
-  if #coerced > 0 then
-    vim.notify("neovide.nvim: ignored invalid saved value(s): " .. table.concat(coerced, ", "), vim.log.levels.WARN)
+  local names = vim.tbl_keys(coerced)
+  if #names > 0 then
+    table.sort(names)
+    vim.notify("neovide.nvim: ignored invalid saved value(s): " .. table.concat(names, ", "), vim.log.levels.WARN)
   end
 end
 

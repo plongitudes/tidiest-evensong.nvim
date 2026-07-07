@@ -10,7 +10,7 @@ function M.new()
     saved_values = {},
   }
 
-  -- Start with all categories expanded
+  -- Start with all categories collapsed
   local registry = require("neovide.registry")
   for _, cat in ipairs(registry.categories()) do
     self.categories_expanded[cat] = false
@@ -55,7 +55,10 @@ end
 
 function M:mark_clean(key)
   self.dirty[key] = nil
-  self.saved_values[key] = self.setting_values[key]
+  -- Deepcopy so the baseline can't alias a table-valued setting (matches
+  -- mark_all_clean); otherwise a later in-place edit would silently mutate the
+  -- saved baseline and defeat dirty tracking.
+  self.saved_values[key] = vim.deepcopy(self.setting_values[key])
 end
 
 function M:mark_all_clean()
