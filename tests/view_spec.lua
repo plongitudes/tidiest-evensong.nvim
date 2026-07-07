@@ -39,7 +39,7 @@ describe("view explicit-save model", function()
   it("reverts unsaved changes when reopened rather than adopting them", function()
     view.open()
     view._set_value(registry.get("opacity"), 0.5)
-    view.open("Display") -- reopen while dirty (e.g. :Neovide Display)
+    view.open("Display") -- reopen while dirty (e.g. :Evensong Display)
     assert.are.equal(1.0, vim.g.neovide_opacity) -- preview reverted, not adopted
   end)
 

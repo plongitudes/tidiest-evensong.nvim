@@ -4,7 +4,7 @@ An in-editor settings manager for [Neovide](https://neovide.dev/). Browse, tweak
 persist Neovide's runtime settings from a floating UI inside Neovim — no more hunting
 through `vim.g.neovide_*` globals or restarting to see what a value does.
 
-> The plugin exposes the module `neovide` and the `:Neovide` command. Settings are applied
+> The plugin exposes the module `neovide` and the `:Evensong` command. Settings are applied
 > live where Neovide supports it, persisted to disk, and re-applied (with validation) on
 > the next launch.
 
@@ -80,10 +80,10 @@ don't use a patched font you can swap in plain text (e.g. `icons = { modified = 
 ## Usage
 
 ```vim
-:Neovide            " open the settings UI
-:Neovide profiles   " open the profiles view
-:Neovide help       " open the help view
-:Neovide Window     " open focused on a category (matched by name)
+:Evensong            " open the settings UI
+:Evensong profiles   " open the profiles view
+:Evensong help       " open the help view
+:Evensong Window     " open focused on a category (matched by name)
 ```
 
 Or from Lua: `require("neovide").open()`, `.close()`, `.toggle()`.

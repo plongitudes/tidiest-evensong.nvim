@@ -18,7 +18,7 @@ tidiest-evensong.nvim is an in-editor settings manager for Neovide. It opens a
 floating UI where you can browse, edit, and persist Neovide's runtime settings
 without editing |vim.g| globals by hand.
 
-The plugin exposes the Lua module `neovide` and the |:Neovide| command. Changes
+The plugin exposes the Lua module `neovide` and the |:Evensong| command. Changes
 are applied live where Neovide supports it, persisted to disk, and re-applied
 on the next launch. Persisted values are validated on the way back in: an
 invalid value (for example an unset theme captured as an empty string) is
@@ -73,8 +73,8 @@ icons       table    Glyphs used in the UI. Top-level keys: bool_true,
 ==============================================================================
 4. COMMANDS                                                  *neovide-commands*
 
-                                                                     *:Neovide*
-:Neovide [arg]          Open the settings UI. With no argument, opens the
+                                                                    *:Evensong*
+:Evensong [arg]         Open the settings UI. With no argument, opens the
                         settings view. Recognized arguments:
                             profiles    open the profiles view
                             help        open the help view
