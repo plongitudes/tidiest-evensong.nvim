@@ -63,11 +63,19 @@ require("neovide").setup({
                                         --   stdpath("data") .. "/neovide.nvim"
   settings = {},                        -- your own default overrides, keyed by setting key,
                                         --   e.g. { theme = "dark", opacity = 0.95 }
+  -- keys = { ... },                    -- override individual keymaps (see below)
+  -- icons = { ... },                   -- override UI glyphs (see below)
 })
 ```
 
 Values in `settings` act as *your* defaults: they are applied on startup and are the
 baseline the persistence layer compares against when deciding what to write to disk.
+
+The UI glyphs come from the `icons` table. Top-level keys are `bool_true`, `bool_false`,
+`collapsed`, `expanded`, `modified`, `restart`, `settings`, `profiles`, and `help`;
+`icons.category` maps each category name (e.g. `Display`, `Cursor`, `"Startup (TOML)"`) to
+its header glyph. Override any subset — unset keys keep the Nerd Font defaults, so if you
+don't use a patched font you can swap in plain text (e.g. `icons = { modified = "*" }`).
 
 ## Usage
 
@@ -85,6 +93,7 @@ Or from Lua: `require("neovide").open()`, `.close()`, `.toggle()`.
 | Key            | Action                          |
 | -------------- | ------------------------------- |
 | `<CR>`         | Activate — fold section · toggle bool · cycle enum · edit value |
+| `j` / `k`      | Next / previous setting         |
 | `l` / `h`      | Expand / collapse section; on a setting, increment / decrement value |
 | `}` / `{`      | Next / previous section (also `]]` / `[[`) |
 | `gg` / `G`     | Jump to top / bottom            |
@@ -94,7 +103,8 @@ Or from Lua: `require("neovide").open()`, `.close()`, `.toggle()`.
 | `L` / `?`      | Profiles view / help            |
 | `q` / `<Esc>`  | Close & discard unsaved changes |
 
-All keys are configurable via the `keys` table in `setup()`. `<CR>` is the single
+Most keys are configurable via the `keys` table in `setup()`; the built-in motions
+`j`/`k`, `gg`/`G`, and `]]`/`[[` are fixed. `<CR>` is the single
 "activate this row" key: it folds a section, toggles a boolean, cycles an enum, or edits
 any other value type. The description of the focused setting is shown in the window's
 top bar as you move.

@@ -62,6 +62,13 @@ settings    table    Your own default overrides, keyed by setting key, e.g.
                      startup and used as the baseline the persistence layer
                      compares against when deciding what to save.
 keys        table    Override any of the default keymaps (see |neovide-keymaps|).
+icons       table    Glyphs used in the UI. Top-level keys: bool_true,
+                     bool_false, collapsed, expanded, modified, restart,
+                     settings, profiles, help. `icons.category` is a map from
+                     category name (e.g. Display, Cursor, "Startup (TOML)") to
+                     its header glyph. Override any subset; unset keys keep the
+                     defaults. Nerd Font glyphs by default — override with
+                     plain text if you don't use a patched font.
 
 ==============================================================================
 4. COMMANDS                                                  *neovide-commands*
@@ -83,14 +90,16 @@ Lua API: >
 ==============================================================================
 5. KEYMAPS                                                    *neovide-keymaps*
 
-Default keymaps active inside the settings UI (all configurable via the `keys`
-table in |neovide-setup|):
+Default keymaps active inside the settings UI. Most are configurable via the
+`keys` table in |neovide-setup|; the built-in motions j / k, gg / G, and
+]] / [[ are fixed and cannot be remapped through `keys`:
 
     <CR>          Activate the current row: fold a section, toggle a boolean,
                   cycle an enum, or edit any other value type. Font settings
                   open a live-preview picker of installed monospace families
                   (each applied as you move; <CR> keeps it and prompts for a
                   point size, c = free-form input, <Esc> restores).
+    j / k         Move to the next / previous setting
     l / h         Expand / collapse a section; on a setting, increment /
                   decrement the current value
     } / {         Next / previous section (also ]] / [[). From a setting, {
