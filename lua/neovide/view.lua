@@ -13,8 +13,11 @@ local float = nil
 local state = nil
 
 function M.open(arg)
+  -- Reopening while a menu is already up must honour the explicit-save model: revert
+  -- any unsaved live previews first (M.close does this), so State.new below captures a
+  -- clean baseline instead of silently adopting the dirty preview as "saved".
   if float and float:is_open() then
-    float:close()
+    M.close()
   end
 
   state = State.new()
