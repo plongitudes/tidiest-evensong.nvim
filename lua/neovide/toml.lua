@@ -127,8 +127,13 @@ function M._parse_value(raw)
   return raw
 end
 
+-- NOTE: this regenerates config.toml from the parsed table — comments are not
+-- preserved and keys are re-sorted. The plugin owns/reformats config.toml; keep any
+-- hand-written comments elsewhere. toml.set skips the rewrite entirely when the value
+-- is unchanged, so a file the plugin never modifies stays byte-for-byte intact.
 function M.write(path, data)
   path = path or M.config_path()
+  local float_keys = require("neovide.registry").float_toml_keys()
 
   local lines = {}
 
@@ -146,7 +151,7 @@ function M.write(path, data)
   table.sort(section_keys)
 
   for _, k in ipairs(top_keys) do
-    table.insert(lines, k .. " = " .. M._format_value(data[k]))
+    table.insert(lines, k .. " = " .. M._format_value(data[k], float_keys[k]))
   end
 
   if #top_keys > 0 and #section_keys > 0 then
@@ -155,7 +160,7 @@ function M.write(path, data)
 
   -- Write sections
   for _, section in ipairs(section_keys) do
-    M._write_section(lines, section, data[section])
+    M._write_section(lines, section, data[section], float_keys)
   end
 
   local content = table.concat(lines, "\n") .. "\n"
@@ -165,7 +170,8 @@ function M.write(path, data)
   end
 end
 
-function M._write_section(lines, prefix, tbl)
+function M._write_section(lines, prefix, tbl, float_keys)
+  float_keys = float_keys or {}
   local flat_keys = {}
   local nested_keys = {}
   for k, v in pairs(tbl) do
@@ -181,20 +187,26 @@ function M._write_section(lines, prefix, tbl)
   if #flat_keys > 0 then
     table.insert(lines, "[" .. prefix .. "]")
     for _, k in ipairs(flat_keys) do
-      table.insert(lines, k .. " = " .. M._format_value(tbl[k]))
+      table.insert(lines, k .. " = " .. M._format_value(tbl[k], float_keys[prefix .. "." .. k]))
     end
     table.insert(lines, "")
   end
 
   for _, k in ipairs(nested_keys) do
-    M._write_section(lines, prefix .. "." .. k, tbl[k])
+    M._write_section(lines, prefix .. "." .. k, tbl[k], float_keys)
   end
 end
 
-function M._format_value(v)
+-- is_float forces a decimal point on whole numbers ("14" -> "14.0") for keys whose
+-- setting is float-typed; a bare integer would change the TOML type and Neovide's
+-- Rust-side deserialization rejects an integer where it expects a float.
+function M._format_value(v, is_float)
   if type(v) == "boolean" then
     return v and "true" or "false"
   elseif type(v) == "number" then
+    if is_float then
+      return (v == math.floor(v)) and string.format("%.1f", v) or tostring(v)
+    end
     if v == math.floor(v) then
       return tostring(math.floor(v))
     end
@@ -221,7 +233,14 @@ function M.set(key_path, value)
     end
     node = node[keys[i]]
   end
-  node[keys[#keys]] = value
+  local last = keys[#keys]
+  -- Skip the whole-file (comment-stripping) rewrite when the on-disk value already
+  -- matches. This is what keeps an untouched config.toml intact and stops
+  -- apply_saved from rewriting the file on every launch for unchanged toml_* keys.
+  if require("neovide.util").deep_equals(node[last], value) then
+    return
+  end
+  node[last] = value
   M.write(nil, data)
 end
 

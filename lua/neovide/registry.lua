@@ -959,6 +959,20 @@ function M.is_valid(setting, value)
   return true -- unconstrained/unknown type: don't block what we don't model
 end
 
+--- Set of dotted TOML key paths (e.g. "font.size") whose setting is float-typed.
+--- The TOML writer uses this to keep a decimal point on whole numbers, since
+--- Neovide's Rust config deserializer rejects a bare integer for an f32 field.
+---@return table<string, boolean>
+function M.float_toml_keys()
+  local set = {}
+  for _, setting in ipairs(M.settings) do
+    if setting.source == "toml" and setting.type == "float" and setting.toml_key then
+      set[setting.toml_key] = true
+    end
+  end
+  return set
+end
+
 function M.read_value(setting)
   if setting.source == "runtime" then
     local val = vim.g[setting.var_name]

@@ -507,15 +507,14 @@ function M._save_all()
   -- Save runtime settings
   persistence.save(state.setting_values)
 
-  -- Write only dirty TOML settings that differ from built-in defaults
+  -- Persist every dirty TOML setting. toml.set no-ops when the on-disk value already
+  -- matches, so writing an unchanged value is cheap — and, unlike the old skip-if-equal-
+  -- to-default guard, resetting a toml_* key to its default now correctly overwrites a
+  -- stale non-default line in config.toml instead of silently leaving it.
   for key, _ in pairs(state.dirty) do
     local setting = registry.get(key)
     if setting and setting.source == "toml" then
-      local value = state.setting_values[key]
-      local util = require("neovide.util")
-      if not util.deep_equals(value, setting.default) then
-        registry.write_value(setting, value)
-      end
+      registry.write_value(setting, state.setting_values[key])
     end
   end
 
