@@ -31,9 +31,12 @@ function M.throttle(fn, ms)
   end
 end
 
+-- Returns the debounced function and its uv timer. The caller owns the timer's
+-- lifetime: :stop() + :close() it when the debounced work is done, or it leaks a
+-- libuv handle per debounce() call (e.g. once per font-picker open).
 function M.debounce(fn, ms)
   local timer = vim.uv.new_timer()
-  return function(...)
+  local wrapped = function(...)
     local args = { ... }
     timer:stop()
     timer:start(ms, 0, function()
@@ -43,6 +46,7 @@ function M.debounce(fn, ms)
       end)
     end)
   end
+  return wrapped, timer
 end
 
 function M.deep_equals(a, b)

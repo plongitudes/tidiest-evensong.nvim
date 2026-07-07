@@ -34,7 +34,7 @@ function M.open(opts)
     vim.o.guifont = (size and size ~= "") and (family .. ":h" .. size) or family
   end
   -- Debounced so holding j/k doesn't thrash Neovide's font engine.
-  local preview = util.debounce(apply_preview, 40)
+  local preview, preview_timer = util.debounce(apply_preview, 40)
 
   local float = Float.new({ title = " Select Font ", backdrop = false })
   float:open()
@@ -49,12 +49,17 @@ function M.open(opts)
 
   -- Tear down, restore the original font, then run the follow-up action. Restoring
   -- unconditionally keeps preview side effects from leaking; on_choose re-applies.
+  -- Idempotent (guarded by `done`) so it is safe to reach via a keymap OR the
+  -- WinClosed autocmd below — clearing our augroup removes that autocmd on the keymap
+  -- path so float:close() does not re-enter here.
   local function finish(action)
     if done then
       return
     end
     done = true
     pcall(vim.api.nvim_clear_autocmds, { group = augroup })
+    preview_timer:stop()
+    preview_timer:close()
     vim.o.guifont = original_guifont
     if float:is_open() then
       float:close()
@@ -67,6 +72,18 @@ function M.open(opts)
     buffer = buf,
     callback = function()
       preview(list[vim.api.nvim_win_get_cursor(win)[1]])
+    end,
+  })
+
+  -- Restore the font on ANY close, not just the explicit keymaps: :q, <C-w>c, etc.
+  -- close the window without invoking a keymap. Without this the editor would keep
+  -- the last-previewed font. Cancels (no on_choose) since a raw close is not a choice.
+  vim.api.nvim_create_autocmd("WinClosed", {
+    group = augroup,
+    pattern = tostring(win),
+    once = true,
+    callback = function()
+      finish(function() end)
     end,
   })
 
