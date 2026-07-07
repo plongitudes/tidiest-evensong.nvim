@@ -71,6 +71,37 @@ function M.ensure_dir(path)
   end
 end
 
+--- Atomically write `content` to `path`: write a sibling temp file, then rename it
+--- over the target. Rename is atomic on the same filesystem, so a crash or full disk
+--- mid-write can never leave a truncated/empty file (which for config.toml could break
+--- Neovide's own startup). Uses vim.uv.fs_rename, which replaces an existing target on
+--- Windows too (plain os.rename does not). Ensures the parent directory exists.
+---@param path string
+---@param content string
+---@return boolean ok, string|nil err
+function M.write_atomic(path, content)
+  M.ensure_dir(vim.fn.fnamemodify(path, ":h"))
+  local tmp = path .. ".tmp." .. vim.fn.getpid()
+  local f, open_err = io.open(tmp, "w")
+  if not f then
+    return false, open_err or ("could not open " .. tmp .. " for writing")
+  end
+  local wrote, write_err = pcall(function()
+    assert(f:write(content))
+  end)
+  f:close()
+  if not wrote then
+    os.remove(tmp)
+    return false, tostring(write_err)
+  end
+  local renamed, rename_err = vim.uv.fs_rename(tmp, path)
+  if not renamed then
+    os.remove(tmp)
+    return false, rename_err or ("could not rename " .. tmp .. " to " .. path)
+  end
+  return true
+end
+
 function M.tbl_keys_sorted(t)
   local keys = vim.tbl_keys(t)
   table.sort(keys)

@@ -53,4 +53,27 @@ describe("persistence with a dirty state file", function()
     local saved = persistence.load()
     assert.are.equal("dark", saved.theme)
   end)
+
+  it("returns an empty table instead of throwing on a corrupt settings.lua", function()
+    write_file(settings_path, "return {\n") -- truncated / syntax error
+    local data
+    local ok = pcall(function()
+      data = persistence.load()
+    end)
+    assert.is_true(ok)
+    assert.are.same({}, data)
+  end)
+
+  it("apply_saved does not throw on a corrupt settings.lua", function()
+    write_file(settings_path, "return {\n")
+    local ok = pcall(persistence.apply_saved)
+    assert.is_true(ok)
+  end)
+
+  it("round-trips a saved value through an atomic write", function()
+    persistence.save({ theme = "light" })
+    -- The temp file used during the atomic write must not linger.
+    assert.are.equal(0, vim.fn.filereadable(settings_path .. ".tmp." .. vim.fn.getpid()))
+    assert.are.equal("light", persistence.load().theme)
+  end)
 end)

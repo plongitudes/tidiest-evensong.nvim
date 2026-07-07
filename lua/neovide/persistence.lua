@@ -29,13 +29,14 @@ function M.load()
   if ok and type(data) == "table" then
     return data
   end
+  -- The file exists but could not be parsed (corrupt/truncated). Surface it rather
+  -- than silently dropping the user's entire saved settings.
+  vim.notify("neovide.nvim: could not read saved settings (" .. path .. "); using defaults", vim.log.levels.WARN)
   return {}
 end
 
 function M.save(settings)
   local path = get_path()
-  local dir = vim.fn.fnamemodify(path, ":h")
-  util.ensure_dir(dir)
 
   local registry = require("neovide.registry")
   -- Only save values that differ from user_default and are runtime/vim_option source
@@ -51,10 +52,9 @@ function M.save(settings)
   end
 
   local content = "return " .. vim.inspect(to_save) .. "\n"
-  local f = io.open(path, "w")
-  if f then
-    f:write(content)
-    f:close()
+  local ok, err = util.write_atomic(path, content)
+  if not ok then
+    vim.notify("neovide.nvim: failed to save settings: " .. tostring(err), vim.log.levels.WARN)
   end
 end
 

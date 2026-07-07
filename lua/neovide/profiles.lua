@@ -32,12 +32,14 @@ function M.load(name)
   if ok and type(data) == "table" then
     return data
   end
+  -- The file exists but could not be parsed (corrupt/truncated) — say so rather than
+  -- reporting a missing profile.
+  vim.notify("neovide.nvim: could not read profile '" .. name .. "' (" .. path .. ")", vim.log.levels.WARN)
   return nil
 end
 
 function M.save(name, settings, desc)
   local dir = profiles_dir()
-  util.ensure_dir(dir)
 
   -- Only snapshot runtime settings (not TOML), and never bake an invalid value
   -- into a profile file (a profile with theme = "" would crash Neovide on load).
@@ -58,10 +60,9 @@ function M.save(name, settings, desc)
 
   local path = dir .. "/" .. name .. ".lua"
   local content = "return " .. vim.inspect(profile) .. "\n"
-  local f = io.open(path, "w")
-  if f then
-    f:write(content)
-    f:close()
+  local ok, err = util.write_atomic(path, content)
+  if not ok then
+    vim.notify("neovide.nvim: failed to save profile '" .. name .. "': " .. tostring(err), vim.log.levels.WARN)
   end
 end
 

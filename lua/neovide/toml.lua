@@ -129,8 +129,6 @@ end
 
 function M.write(path, data)
   path = path or M.config_path()
-  local dir = vim.fn.fnamemodify(path, ":h")
-  require("neovide.util").ensure_dir(dir)
 
   local lines = {}
 
@@ -160,10 +158,10 @@ function M.write(path, data)
     M._write_section(lines, section, data[section])
   end
 
-  local f = io.open(path, "w")
-  if f then
-    f:write(table.concat(lines, "\n") .. "\n")
-    f:close()
+  local content = table.concat(lines, "\n") .. "\n"
+  local ok, err = require("neovide.util").write_atomic(path, content)
+  if not ok then
+    vim.notify("neovide.nvim: failed to write " .. path .. ": " .. tostring(err), vim.log.levels.WARN)
   end
 end
 
