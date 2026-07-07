@@ -9,7 +9,8 @@ CONTENTS                                                     *evensong-contents*
   4. Commands ................................. |evensong-commands|
   5. Keymaps .................................. |evensong-keymaps|
   6. Persistence .............................. |evensong-persistence|
-  7. Development .............................. |evensong-development|
+  7. Highlights ............................... |evensong-highlights|
+  8. Development .............................. |evensong-development|
 
 ==============================================================================
 1. INTRODUCTION                                          *evensong-introduction*
@@ -130,7 +131,45 @@ On apply, any value that fails validation is coerced to its registered default
 and reported once via |vim.notify()|.
 
 ==============================================================================
-7. DEVELOPMENT                                            *evensong-development*
+7. HIGHLIGHTS                                            *evensong-highlights*
+
+The UI defines the highlight groups below. Each is created with `default = true`
+and linked to a standard group, so it follows your colorscheme out of the box
+and is refreshed on |ColorScheme|. Override any of them to reskin just this
+plugin, for example: >
+
+    vim.api.nvim_set_hl(0, "EvensongDimmed", { link = "NonText" })
+<
+    Group                        Default link ~
+    EvensongNormal               NormalFloat
+    EvensongBorder               FloatBorder
+    EvensongTitle                Title
+    EvensongH1                   IncSearch
+    EvensongCategory             Title
+    EvensongCategoryIcon         @punctuation.special
+    EvensongSettingName          Identifier
+    EvensongBoolTrue             DiagnosticOk
+    EvensongBoolFalse            DiagnosticError
+    EvensongNumberValue          Number
+    EvensongStringValue          @string
+    EvensongEnumValue            Constant
+    EvensongSliderFilled         Constant
+    EvensongSliderEmpty          LineNr
+    EvensongBadgeRestart         DiagnosticWarn
+    EvensongBadgePlatform        DiagnosticInfo
+    EvensongBadgeNightly         DiagnosticHint
+    EvensongBadgeModified        DiagnosticWarn
+    EvensongBadgeUnavailable     DiagnosticError
+    EvensongButton               CursorLine
+    EvensongButtonActive         Visual
+    EvensongKey                  Statement
+    EvensongDimmed               Conceal
+    EvensongProfileName          Title
+    EvensongProfileActive        DiagnosticOk
+    EvensongBackdrop             (opaque black background; not linked)
+
+==============================================================================
+8. DEVELOPMENT                                            *evensong-development*
 
 Run the test suite (requires plenary.nvim on the runtimepath): >
 
