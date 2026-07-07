@@ -410,11 +410,12 @@ function M._pick_font(setting)
 end
 
 -- Step two of the font editor: choose the point size, prefilled with the current one.
--- Empty input drops the size suffix; invalid input keeps the current size.
+-- Esc aborts the whole font change (like every other input prompt); empty input drops
+-- the size suffix; invalid input keeps the current size.
 function M._prompt_font_size(setting, family, current_size)
   vim.ui.input({ prompt = "Size (pt): ", default = current_size or "14" }, function(input)
     if input == nil then
-      input = current_size or "14"
+      return
     end
     input = vim.trim(input)
     local value

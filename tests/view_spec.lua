@@ -49,6 +49,37 @@ describe("view explicit-save model", function()
     assert.are.equal(0.5, persistence.load().opacity)
     assert.are.equal(0.5, vim.g.neovide_opacity)
   end)
+
+  -- L5: Esc at the font-size prompt aborts, like every other input cancel path.
+  it("aborts the font change when Esc is pressed at the size prompt", function()
+    view.open()
+    local called = false
+    local orig_set, orig_input = view._set_value, vim.ui.input
+    view._set_value = function()
+      called = true
+    end
+    vim.ui.input = function(_, cb)
+      cb(nil)
+    end -- simulate Esc
+    view._prompt_font_size(registry.get("guifont"), "Foo", "12")
+    view._set_value, vim.ui.input = orig_set, orig_input
+    assert.is_false(called)
+  end)
+
+  it("commits family:size when a size is entered at the prompt", function()
+    view.open()
+    local got
+    local orig_set, orig_input = view._set_value, vim.ui.input
+    view._set_value = function(_, value)
+      got = value
+    end
+    vim.ui.input = function(_, cb)
+      cb("16")
+    end
+    view._prompt_font_size(registry.get("guifont"), "Foo", "12")
+    view._set_value, vim.ui.input = orig_set, orig_input
+    assert.are.equal("Foo:h16", got)
+  end)
 end)
 
 describe("view Apply with a TOML setting", function()
