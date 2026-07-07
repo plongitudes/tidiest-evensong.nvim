@@ -10,6 +10,11 @@ local M = {}
 -- is left to the caller's on_choose (via the normal set-value path), so the result
 -- still respects auto_apply and dirty tracking.
 --
+-- Note: the browse-time preview is live regardless of auto_apply — previewing is the
+-- picker's whole purpose. Under auto_apply=false the chosen font is marked [modified]
+-- and applies on Apply like any other setting, so the editor reverts to the original
+-- font on close until you Apply. This is intentional (see te-bph / M5).
+--
 --   opts.current_family  string?      preselect this family
 --   opts.size            string?      current size (e.g. "14"); builds the preview
 --   opts.on_choose       fun(family)  called with the chosen family
