@@ -2,17 +2,15 @@
 
 ## What is Tidiest Evensong?
 
-An in-editor settings manager for [Neovide](https://neovide.dev/). Browse, tweak, and persist Neovide-specific runtime settings from a floating UI inside Neovim — no more hunting through `vim.g.neovide_*` globals or restarting to see what a value does.
+An in-editor settings manager for [Neovide](https://neovide.dev/). Browse, tweak, and persist Neovide-specific runtime settings from a floating UI inside Neovide — no more hunting through `vim.g.neovide_*` globals or restarting to see what a value does.
 
 "Okay," you're saying. "No, really, what the hell with that name, man?"
 
 I like words, and etymologies. "Tidiest Evensong" is just an anagram for "Neovide Settings", and I thought that 'evensong' had a kind of magical sound and feel to it when it popped up as a candidate word. Anyway, Evensong is (I'm literally learning this as I'm typing it up here) a church service sung between [vespers](https://en.wikipedia.org/wiki/Vespers) and [compline](https://en.wikipedia.org/wiki/Compline). In Old English, 'vesperas' became 'æfensang' -- from [ǣfen](https://en.wiktionary.org/wiki/%C3%A6fen#Old_English) (“evening”) + [sang](https://en.wiktionary.org/wiki/sang#Old_English) (“liturgical service”).
 
-But really, none of that is even mildly relevant, unless you feel like having a TUI interface into all of Neovide's settings is a magical way to keep things tidy in your setup. In that case, you're welcome. :D
+But really, none of that is even mildly relevant, unless you feel that having a TUI interface into all of Neovide's settings is a magical way to keep things tidy in your setup. In which case, you're welcome. :D
 
-> The plugin exposes the module `evensong` and the `:Evensong` command. Settings are applied
-> live where Neovide supports it, persisted to disk, and re-applied (with validation) on
-> the next launch.
+> The plugin exposes the module `evensong` and the `:Evensong` command. Settings are applied live where Neovide supports it, persisted to disk, and re-applied (with validation) on the next launch.
 
 ## Features
 
