@@ -1,5 +1,5 @@
-local config = require("neovide.config")
-local font_picker = require("neovide.font_picker")
+local config = require("evensong.config")
+local font_picker = require("evensong.font_picker")
 
 describe("font_picker restore-on-close", function()
   before_each(function()
@@ -10,7 +10,7 @@ describe("font_picker restore-on-close", function()
   after_each(function()
     -- Make sure no picker window is left open between tests.
     pcall(function()
-      if vim.bo.filetype == "neovide" then
+      if vim.bo.filetype == "evensong" then
         vim.cmd("close")
       end
     end)

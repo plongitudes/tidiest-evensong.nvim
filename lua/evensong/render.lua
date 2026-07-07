@@ -1,8 +1,8 @@
-local Text = require("neovide.text")
-local config = require("neovide.config")
-local registry = require("neovide.registry")
-local platform_mod = require("neovide.platform")
-local util = require("neovide.util")
+local Text = require("evensong.text")
+local config = require("evensong.config")
+local registry = require("evensong.registry")
+local platform_mod = require("evensong.platform")
+local util = require("evensong.util")
 
 local M = {}
 
@@ -57,14 +57,14 @@ function M._header(text, state)
   local icons = cfg.icons
 
   -- Title line
-  text:append("  ", "NeovideNormal")
-  text:append(" Neovide ", "NeovideH1")
-  text:append("  ", "NeovideNormal")
+  text:append("  ", "EvensongNormal")
+  text:append(" Neovide ", "EvensongH1")
+  text:append("  ", "EvensongNormal")
   M._push_loc("header")
   text:nl()
 
   -- Mode pills
-  text:append("  ", "NeovideNormal")
+  text:append("  ", "EvensongNormal")
   local keys = cfg.keys
   local modes = {
     { key = "settings", icon = icons.settings, label = "Settings" },
@@ -73,20 +73,20 @@ function M._header(text, state)
   }
   for i, mode in ipairs(modes) do
     local active = state.mode == mode.key
-    local hl = active and "NeovideButtonActive" or "NeovideButton"
+    local hl = active and "EvensongButtonActive" or "EvensongButton"
     if not active and mode.hotkey then
-      text:append(" " .. mode.hotkey .. " ", "NeovideKey")
+      text:append(" " .. mode.hotkey .. " ", "EvensongKey")
     end
     text:append(" " .. mode.icon .. mode.label .. " ", hl)
     if i < #modes then
-      text:append(" ", "NeovideNormal")
+      text:append(" ", "EvensongNormal")
     end
   end
 
   -- Dirty count
   if state:has_dirty() then
-    text:append("  ", "NeovideNormal")
-    text:append(" " .. icons.modified .. state:dirty_count() .. " modified ", "NeovideBadgeModified")
+    text:append("  ", "EvensongNormal")
+    text:append(" " .. icons.modified .. state:dirty_count() .. " modified ", "EvensongBadgeModified")
   end
 
   M._push_loc("header")
@@ -106,11 +106,11 @@ function M._settings(text, state)
     -- Category header
     local icon = expanded and icons.expanded or icons.collapsed
     local cat_icon = icons.category[cat_name] or "  "
-    text:append("  ", "NeovideNormal")
-    text:append(icon, "NeovideCategoryIcon")
-    text:append(cat_icon, "NeovideCategoryIcon")
-    text:append(cat_name, "NeovideCategory")
-    text:append(" (" .. #settings .. ")", "NeovideDimmed")
+    text:append("  ", "EvensongNormal")
+    text:append(icon, "EvensongCategoryIcon")
+    text:append(cat_icon, "EvensongCategoryIcon")
+    text:append(cat_name, "EvensongCategory")
+    text:append(" (" .. #settings .. ")", "EvensongDimmed")
     M._push_loc("category", nil, cat_name)
     text:nl()
 
@@ -131,15 +131,15 @@ function M._setting_row(text, state, setting)
   local is_dirty = state:is_dirty(setting.key)
 
   -- Indent
-  text:append("    ", "NeovideNormal")
+  text:append("    ", "EvensongNormal")
 
   if not available then
     -- Dimmed unavailable setting
-    text:append(setting.display_name, "NeovideDimmed")
-    text:append(name_pad(setting.display_name), "NeovideDimmed")
+    text:append(setting.display_name, "EvensongDimmed")
+    text:append(name_pad(setting.display_name), "EvensongDimmed")
     local reason = platform_mod.unavailable_reason(setting)
     if reason then
-      text:append("[" .. reason .. "]", "NeovideBadgeUnavailable")
+      text:append("[" .. reason .. "]", "EvensongBadgeUnavailable")
     end
     M._push_loc("setting", setting.key, setting.category)
     text:nl()
@@ -147,8 +147,8 @@ function M._setting_row(text, state, setting)
   end
 
   -- Setting name
-  text:append(setting.display_name, "NeovideSettingName")
-  text:append(name_pad(setting.display_name), "NeovideNormal")
+  text:append(setting.display_name, "EvensongSettingName")
+  text:append(name_pad(setting.display_name), "EvensongNormal")
 
   -- Type-specific value rendering
   if setting.type == "boolean" then
@@ -175,9 +175,9 @@ end
 function M._render_bool(text, value, cfg)
   local icons = cfg.icons
   if value then
-    text:append(icons.bool_true .. "true", "NeovideBoolTrue")
+    text:append(icons.bool_true .. "true", "EvensongBoolTrue")
   else
-    text:append(icons.bool_false .. "false", "NeovideBoolFalse")
+    text:append(icons.bool_false .. "false", "EvensongBoolFalse")
   end
 end
 
@@ -194,85 +194,85 @@ function M._slider(text, value, min, max)
   local filled = math.floor(ratio * BAR_WIDTH + 0.5)
   local empty = BAR_WIDTH - filled
 
-  text:append(string.rep(BAR_GLYPH, filled), "NeovideSliderFilled")
-  text:append(string.rep(BAR_GLYPH, empty), "NeovideSliderEmpty")
-  text:append(" ", "NeovideNormal")
+  text:append(string.rep(BAR_GLYPH, filled), "EvensongSliderFilled")
+  text:append(string.rep(BAR_GLYPH, empty), "EvensongSliderEmpty")
+  text:append(" ", "EvensongNormal")
 end
 
 function M._render_float(text, value, setting)
   if setting.min ~= nil and setting.max ~= nil then
     M._slider(text, value, setting.min, setting.max)
   end
-  text:append(tostring(util.round(value, 3)), "NeovideNumberValue")
+  text:append(tostring(util.round(value, 3)), "EvensongNumberValue")
 end
 
 function M._render_integer(text, value, setting)
   if setting.min ~= nil and setting.max ~= nil then
     M._slider(text, value, setting.min, setting.max)
   end
-  text:append(tostring(value), "NeovideNumberValue")
+  text:append(tostring(value), "EvensongNumberValue")
 end
 
 function M._render_enum(text, value, setting)
   local display = value == "" and "(none)" or tostring(value)
-  text:append(display, "NeovideEnumValue")
+  text:append(display, "EvensongEnumValue")
   if setting.choices then
-    text:append(" [" .. #setting.choices .. " choices]", "NeovideDimmed")
+    text:append(" [" .. #setting.choices .. " choices]", "EvensongDimmed")
   end
 end
 
 function M._render_color(text, value)
   if value and value ~= "" then
-    text:append(tostring(value), "NeovideStringValue")
-    text:append(" ", "NeovideNormal")
-    text:append("██", "NeovideStringValue")
+    text:append(tostring(value), "EvensongStringValue")
+    text:append(" ", "EvensongNormal")
+    text:append("██", "EvensongStringValue")
   else
-    text:append("(not set)", "NeovideDimmed")
+    text:append("(not set)", "EvensongDimmed")
   end
 end
 
 function M._render_string(text, value)
   if value and value ~= "" then
-    text:append(tostring(value), "NeovideStringValue")
+    text:append(tostring(value), "EvensongStringValue")
   else
-    text:append("(not set)", "NeovideDimmed")
+    text:append("(not set)", "EvensongDimmed")
   end
 end
 
 function M._render_badges(text, setting, is_dirty)
   if setting.restart_required then
-    text:append(" [restart]", "NeovideBadgeRestart")
+    text:append(" [restart]", "EvensongBadgeRestart")
   end
   if setting.platform then
-    text:append(" [" .. setting.platform .. "]", "NeovideBadgePlatform")
+    text:append(" [" .. setting.platform .. "]", "EvensongBadgePlatform")
   end
   if setting.nightly then
-    text:append(" [nightly]", "NeovideBadgeNightly")
+    text:append(" [nightly]", "EvensongBadgeNightly")
   end
   if is_dirty then
-    text:append(" [modified]", "NeovideBadgeModified")
+    text:append(" [modified]", "EvensongBadgeModified")
   end
 end
 
 function M._profiles(text, state)
-  local profiles = require("neovide.profiles")
+  local profiles = require("evensong.profiles")
   local list = profiles.list()
 
   if #list == 0 then
-    text:append("  No saved profiles yet.", "NeovideDimmed")
+    text:append("  No saved profiles yet.", "EvensongDimmed")
     M._push_loc("blank")
     text:nl()
     text:nl()
     M._push_loc("blank")
-    text:append("  Press ", "NeovideDimmed")
-    text:append("S", "NeovideKey")
-    text:append(" to save current settings as a profile.", "NeovideDimmed")
+    text:append("  Press ", "EvensongDimmed")
+    text:append("S", "EvensongKey")
+    text:append(" to save current settings as a profile.", "EvensongDimmed")
     M._push_loc("blank")
     text:nl()
   else
     for _, name in ipairs(list) do
-      text:append("  ", "NeovideNormal")
-      text:append(" " .. name .. " ", "NeovideProfileName")
+      text:append("  ", "EvensongNormal")
+      text:append(" " .. name .. " ", "EvensongProfileName")
       M._push_loc("profile", name)
       text:nl()
     end
@@ -287,14 +287,14 @@ function M._help(text)
 
   -- Every helper emits exactly one line (append… → push → nl) so locations stay aligned.
   local function heading(str)
-    text:append("  " .. str, "NeovideCategory")
+    text:append("  " .. str, "EvensongCategory")
     M._push_loc("help")
     text:nl()
   end
   local function row(key, desc)
-    text:append("    ", "NeovideNormal")
-    text:append(string.format("%-11s", key), "NeovideKey")
-    text:append("  " .. desc, "NeovideNormal")
+    text:append("    ", "EvensongNormal")
+    text:append(string.format("%-11s", key), "EvensongKey")
+    text:append("  " .. desc, "EvensongNormal")
     M._push_loc("help")
     text:nl()
   end
@@ -309,11 +309,11 @@ function M._help(text)
   end
 
   raw(function()
-    text:append("  ", "NeovideNormal")
-    text:append(" Neovide Settings ", "NeovideH1")
+    text:append("  ", "EvensongNormal")
+    text:append(" Neovide Settings ", "EvensongH1")
   end)
   raw(function()
-    text:append("  In-editor manager for Neovide's runtime settings.", "NeovideDimmed")
+    text:append("  In-editor manager for Neovide's runtime settings.", "EvensongDimmed")
   end)
   blank()
 
@@ -338,35 +338,35 @@ function M._help(text)
 
   heading("Legend")
   raw(function()
-    text:append("    ", "NeovideNormal")
-    text:append(string.rep("▄", 5), "NeovideSliderFilled")
-    text:append(string.rep("▄", 3), "NeovideSliderEmpty")
-    text:append("   slider — the filled portion is the current value", "NeovideDimmed")
+    text:append("    ", "EvensongNormal")
+    text:append(string.rep("▄", 5), "EvensongSliderFilled")
+    text:append(string.rep("▄", 3), "EvensongSliderEmpty")
+    text:append("   slider — the filled portion is the current value", "EvensongDimmed")
   end)
   local badges = {
-    { "[restart]", "NeovideBadgeRestart", "setting needs a Neovide restart to take effect" },
-    { "[nightly]", "NeovideBadgeNightly", "requires a Neovide nightly build" },
-    { "[macos]", "NeovideBadgePlatform", "platform-specific (also [windows] / [linux])" },
-    { "[modified]", "NeovideBadgeModified", "changed but not yet applied" },
+    { "[restart]", "EvensongBadgeRestart", "setting needs a Neovide restart to take effect" },
+    { "[nightly]", "EvensongBadgeNightly", "requires a Neovide nightly build" },
+    { "[macos]", "EvensongBadgePlatform", "platform-specific (also [windows] / [linux])" },
+    { "[modified]", "EvensongBadgeModified", "changed but not yet applied" },
   }
   for _, b in ipairs(badges) do
     raw(function()
-      text:append("    ", "NeovideNormal")
+      text:append("    ", "EvensongNormal")
       text:append(string.format("%-11s", b[1]), b[2])
-      text:append("  " .. b[3], "NeovideDimmed")
+      text:append("  " .. b[3], "EvensongDimmed")
     end)
   end
   raw(function()
-    text:append("    ", "NeovideNormal")
-    text:append(string.format("%-11s", "(not set)"), "NeovideDimmed")
-    text:append("  no value assigned", "NeovideDimmed")
+    text:append("    ", "EvensongNormal")
+    text:append(string.format("%-11s", "(not set)"), "EvensongDimmed")
+    text:append("  no value assigned", "EvensongDimmed")
   end)
   blank()
 
   raw(function()
-    text:append("  See ", "NeovideDimmed")
-    text:append(":help neovide", "NeovideKey")
-    text:append("  ·  github.com/plongitudes/tidiest-evensong.nvim", "NeovideDimmed")
+    text:append("  See ", "EvensongDimmed")
+    text:append(":help evensong", "EvensongKey")
+    text:append("  ·  github.com/plongitudes/tidiest-evensong.nvim", "EvensongDimmed")
   end)
 end
 

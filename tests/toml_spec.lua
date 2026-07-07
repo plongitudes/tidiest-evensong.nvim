@@ -1,4 +1,4 @@
-local toml = require("neovide.toml")
+local toml = require("evensong.toml")
 
 local function write_file(path, content)
   local f = assert(io.open(path, "w"))

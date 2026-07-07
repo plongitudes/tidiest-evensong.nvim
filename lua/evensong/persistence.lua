@@ -1,7 +1,7 @@
 local M = {}
 
-local config = require("neovide.config")
-local util = require("neovide.util")
+local config = require("evensong.config")
+local util = require("evensong.util")
 
 local function get_path()
   local data_path = config.get().data_path
@@ -15,7 +15,7 @@ function M.user_default(key)
   if user_settings[key] ~= nil then
     return user_settings[key]
   end
-  local registry = require("neovide.registry")
+  local registry = require("evensong.registry")
   local setting = registry.get(key)
   return setting and setting.default
 end
@@ -31,14 +31,14 @@ function M.load()
   end
   -- The file exists but could not be parsed (corrupt/truncated). Surface it rather
   -- than silently dropping the user's entire saved settings.
-  vim.notify("neovide.nvim: could not read saved settings (" .. path .. "); using defaults", vim.log.levels.WARN)
+  vim.notify("evensong: could not read saved settings (" .. path .. "); using defaults", vim.log.levels.WARN)
   return {}
 end
 
 function M.save(settings)
   local path = get_path()
 
-  local registry = require("neovide.registry")
+  local registry = require("evensong.registry")
   -- Only save values that differ from user_default and are runtime/vim_option source
   local to_save = {}
   for key, value in pairs(settings) do
@@ -54,12 +54,12 @@ function M.save(settings)
   local content = "return " .. vim.inspect(to_save) .. "\n"
   local ok, err = util.write_atomic(path, content)
   if not ok then
-    vim.notify("neovide.nvim: failed to save settings: " .. tostring(err), vim.log.levels.WARN)
+    vim.notify("evensong: failed to save settings: " .. tostring(err), vim.log.levels.WARN)
   end
 end
 
 function M.apply_saved()
-  local registry = require("neovide.registry")
+  local registry = require("evensong.registry")
   -- Track coercion per key (not as a flat list): a later layer applying a *valid*
   -- value for the same key clears an earlier layer's coercion, so we never warn
   -- about a key that ends up with a good value.
@@ -88,7 +88,7 @@ function M.apply_saved()
   local names = vim.tbl_keys(coerced)
   if #names > 0 then
     table.sort(names)
-    vim.notify("neovide.nvim: ignored invalid saved value(s): " .. table.concat(names, ", "), vim.log.levels.WARN)
+    vim.notify("evensong: ignored invalid saved value(s): " .. table.concat(names, ", "), vim.log.levels.WARN)
   end
 end
 

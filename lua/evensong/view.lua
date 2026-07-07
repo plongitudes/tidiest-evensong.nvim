@@ -1,11 +1,11 @@
-local Float = require("neovide.float")
-local State = require("neovide.state")
-local render = require("neovide.render")
-local registry = require("neovide.registry")
-local config = require("neovide.config")
-local platform_mod = require("neovide.platform")
-local persistence = require("neovide.persistence")
-local util = require("neovide.util")
+local Float = require("evensong.float")
+local State = require("evensong.state")
+local render = require("evensong.render")
+local registry = require("evensong.registry")
+local config = require("evensong.config")
+local platform_mod = require("evensong.platform")
+local persistence = require("evensong.persistence")
+local util = require("evensong.util")
 
 local M = {}
 
@@ -54,7 +54,7 @@ function M.open(arg)
   -- autocmd, so it is cleaned up automatically when the scratch buffer is wiped on close.
   vim.api.nvim_create_autocmd("CursorMoved", {
     buffer = float.buf,
-    group = vim.api.nvim_create_augroup("neovide_view_detail", { clear = true }),
+    group = vim.api.nvim_create_augroup("evensong_view_detail", { clear = true }),
     callback = function()
       if float and float:is_open() then
         -- Keep the tracked row in sync with any cursor movement, including unmapped
@@ -84,7 +84,7 @@ function M._update_detail()
     if setting and setting.description and setting.description ~= "" then
       -- Escape % so the winbar does not interpret them as statusline items.
       local desc = setting.description:gsub("%%", "%%%%")
-      detail = "%#NeovideCategoryIcon# ⓘ %#NeovideDimmed#" .. desc
+      detail = "%#EvensongCategoryIcon# ⓘ %#EvensongDimmed#" .. desc
     end
   end
   vim.wo[float.win].winbar = detail
@@ -99,7 +99,7 @@ function M.close()
       M._revert_all()
       local apply_key = config.get().keys.apply
       vim.notify(
-        ("neovide.nvim: discarded %d unsaved change(s) — press %q to save next time"):format(n, apply_key),
+        ("evensong: discarded %d unsaved change(s) — press %q to save next time"):format(n, apply_key),
         vim.log.levels.INFO
       )
     end
@@ -281,7 +281,7 @@ function M._setup_keymaps()
   float:on_key(keys.save_profile, function()
     vim.ui.input({ prompt = "Profile name: " }, function(name)
       if name and name ~= "" then
-        local profiles = require("neovide.profiles")
+        local profiles = require("evensong.profiles")
         profiles.save(name, state.setting_values)
         vim.notify("Profile '" .. name .. "' saved", vim.log.levels.INFO)
         if state.mode == "profiles" then
@@ -397,7 +397,7 @@ function M._pick_font(setting)
     family = current ~= "" and current or nil
   end
 
-  require("neovide.font_picker").open({
+  require("evensong.font_picker").open({
     current_family = family,
     size = size,
     on_choose = function(chosen)
@@ -544,7 +544,7 @@ function M._revert_all()
 end
 
 function M._apply_profile(name)
-  local profiles = require("neovide.profiles")
+  local profiles = require("evensong.profiles")
   local profile = profiles.load(name)
   if not profile then
     vim.notify("Profile not found: " .. name, vim.log.levels.WARN)
@@ -563,7 +563,7 @@ function M._apply_profile(name)
     end
   end
   if #coerced > 0 then
-    vim.notify("neovide.nvim: ignored invalid profile value(s): " .. table.concat(coerced, ", "), vim.log.levels.WARN)
+    vim.notify("evensong: ignored invalid profile value(s): " .. table.concat(coerced, ", "), vim.log.levels.WARN)
   end
   vim.notify("Profile '" .. name .. "' applied", vim.log.levels.INFO)
   state.mode = "settings"

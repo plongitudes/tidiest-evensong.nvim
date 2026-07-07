@@ -11,7 +11,7 @@ function M.new()
   }
 
   -- Start with all categories collapsed
-  local registry = require("neovide.registry")
+  local registry = require("evensong.registry")
   for _, cat in ipairs(registry.categories()) do
     self.categories_expanded[cat] = false
   end
@@ -72,7 +72,7 @@ end
 
 function M:set_value(key, value)
   self.setting_values[key] = value
-  local util = require("neovide.util")
+  local util = require("evensong.util")
   if not util.deep_equals(value, self.saved_values[key]) then
     self.dirty[key] = true
   else

@@ -1,5 +1,5 @@
-local config = require("neovide.config")
-local persistence = require("neovide.persistence")
+local config = require("evensong.config")
+local persistence = require("evensong.persistence")
 
 local function write_file(path, content)
   local f = assert(io.open(path, "w"))

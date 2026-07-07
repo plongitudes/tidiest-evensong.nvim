@@ -1,6 +1,6 @@
-local Float = require("neovide.float")
-local fonts = require("neovide.fonts")
-local util = require("neovide.util")
+local Float = require("evensong.float")
+local fonts = require("evensong.fonts")
+local util = require("evensong.util")
 
 local M = {}
 
@@ -23,7 +23,7 @@ function M.open(opts)
   opts = opts or {}
   local list = fonts.list()
   if #list == 0 then
-    vim.notify("neovide.nvim: no fonts found to pick from", vim.log.levels.WARN)
+    vim.notify("evensong: no fonts found to pick from", vim.log.levels.WARN)
     return
   end
 
@@ -50,7 +50,7 @@ function M.open(opts)
   vim.bo[buf].modifiable = false
   vim.wo[win].winbar = "  j/k preview · <CR> keep · c custom · q/<Esc> cancel"
 
-  local augroup = vim.api.nvim_create_augroup("neovide_font_picker", { clear = true })
+  local augroup = vim.api.nvim_create_augroup("evensong_font_picker", { clear = true })
 
   -- Tear down, restore the original font, then run the follow-up action. Restoring
   -- unconditionally keeps preview side effects from leaking; on_choose re-applies.

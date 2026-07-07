@@ -1,8 +1,8 @@
-local platform = require("neovide.platform")
+local platform = require("evensong.platform")
 
 local M = {}
 
----@class NeovideSetting
+---@class EvensongSetting
 ---@field key string
 ---@field display_name string
 ---@field description string
@@ -21,7 +21,7 @@ local M = {}
 ---@field nightly? boolean
 ---@field restart_required? boolean
 
----@type NeovideSetting[]
+---@type EvensongSetting[]
 M.settings = {
   -- ══════════════════════════════════════════
   -- Display
@@ -942,7 +942,7 @@ end
 --- Returns true if the value can be applied/persisted as-is, false otherwise.
 --- Used at the persistence/capture boundaries (read_value, persistence.apply_saved,
 --- persistence.save) to keep junk (e.g. theme = "" or cursor_vfx_mode = {}) out of vim.g and disk.
----@param setting NeovideSetting
+---@param setting EvensongSetting
 ---@param value any
 ---@return boolean
 function M.is_valid(setting, value)
@@ -1000,7 +1000,7 @@ function M.read_value(setting)
     end
     return setting.default
   elseif setting.source == "toml" then
-    local toml = require("neovide.toml")
+    local toml = require("evensong.toml")
     local data = toml.read()
     if data and setting.toml_key then
       local keys = vim.split(setting.toml_key, ".", { plain = true })
@@ -1029,7 +1029,7 @@ function M.write_value(setting, value)
   elseif setting.source == "vim_option" then
     vim.o[setting.vim_option] = value
   elseif setting.source == "toml" then
-    local toml = require("neovide.toml")
+    local toml = require("evensong.toml")
     toml.set(setting.toml_key, value)
   end
 end
@@ -1042,7 +1042,7 @@ end
 ---@param key string
 ---@param value any
 ---@param coerced string[]|nil
----@return NeovideSetting|nil setting, any value, boolean was_coerced
+---@return EvensongSetting|nil setting, any value, boolean was_coerced
 function M.coerce_value(key, value, coerced)
   local setting = M._by_key[key]
   if not setting then

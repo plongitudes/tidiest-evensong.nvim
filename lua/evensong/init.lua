@@ -1,37 +1,37 @@
 local M = {}
 
-local config = require("neovide.config")
-local colors = require("neovide.colors")
+local config = require("evensong.config")
+local colors = require("evensong.colors")
 
 function M.setup(opts)
   config.setup(opts)
   colors.setup()
   colors.register_autocmd()
 
-  if require("neovide.platform").is_neovide() then
-    require("neovide.persistence").apply_saved()
+  if require("evensong.platform").is_neovide() then
+    require("evensong.persistence").apply_saved()
   end
 end
 
 function M.open(arg)
-  if not require("neovide.platform").is_neovide() then
-    vim.notify("neovide.nvim: Not running inside Neovide", vim.log.levels.WARN)
+  if not require("evensong.platform").is_neovide() then
+    vim.notify("evensong: Not running inside Neovide", vim.log.levels.WARN)
     return
   end
-  require("neovide.view").open(arg)
+  require("evensong.view").open(arg)
 end
 
 function M.close()
-  require("neovide.view").close()
+  require("evensong.view").close()
 end
 
 function M.toggle()
-  require("neovide.view").toggle()
+  require("evensong.view").toggle()
 end
 
 function M.complete(lead)
   local items = { "settings", "profiles", "help" }
-  local registry = require("neovide.registry")
+  local registry = require("evensong.registry")
   for _, cat in ipairs(registry.categories()) do
     table.insert(items, cat)
   end

@@ -1,24 +1,24 @@
-*neovide.txt*        In-editor settings manager for Neovide
+*evensong.txt*        In-editor settings manager for Neovide
 
 ==============================================================================
-CONTENTS                                                     *neovide-contents*
+CONTENTS                                                     *evensong-contents*
 
-  1. Introduction ............................. |neovide-introduction|
-  2. Requirements ............................. |neovide-requirements|
-  3. Setup .................................... |neovide-setup|
-  4. Commands ................................. |neovide-commands|
-  5. Keymaps .................................. |neovide-keymaps|
-  6. Persistence .............................. |neovide-persistence|
-  7. Development .............................. |neovide-development|
+  1. Introduction ............................. |evensong-introduction|
+  2. Requirements ............................. |evensong-requirements|
+  3. Setup .................................... |evensong-setup|
+  4. Commands ................................. |evensong-commands|
+  5. Keymaps .................................. |evensong-keymaps|
+  6. Persistence .............................. |evensong-persistence|
+  7. Development .............................. |evensong-development|
 
 ==============================================================================
-1. INTRODUCTION                                          *neovide-introduction*
+1. INTRODUCTION                                          *evensong-introduction*
 
 tidiest-evensong.nvim is an in-editor settings manager for Neovide. It opens a
 floating UI where you can browse, edit, and persist Neovide's runtime settings
 without editing |vim.g| globals by hand.
 
-The plugin exposes the Lua module `neovide` and the |:Evensong| command. Changes
+The plugin exposes the Lua module `evensong` and the |:Evensong| command. Changes
 are applied live where Neovide supports it, persisted to disk, and re-applied
 on the next launch. Persisted values are validated on the way back in: an
 invalid value (for example an unset theme captured as an empty string) is
@@ -28,7 +28,7 @@ avoids startup errors of the form: >
     Setting Theme expected one of auto, dark, light, bg_color, but received ""
 <
 ==============================================================================
-2. REQUIREMENTS                                          *neovide-requirements*
+2. REQUIREMENTS                                          *evensong-requirements*
 
 - Neovim >= 0.10 (uses |vim.uv|).
 - Running inside Neovide for settings to actually apply. The UI opens in any
@@ -37,11 +37,11 @@ avoids startup errors of the form: >
 - plenary.nvim, for running the test suite only.
 
 ==============================================================================
-3. SETUP                                                        *neovide-setup*
+3. SETUP                                                        *evensong-setup*
 
 Call `setup()` (optional; the plugin works with zero configuration): >
 
-    require("neovide").setup({
+    require("evensong").setup({
       size = { width = 0.8, height = 0.8 },
       border = "rounded",
       backdrop = 60,
@@ -50,18 +50,18 @@ Call `setup()` (optional; the plugin works with zero configuration): >
       settings = {},
     })
 <
-                                                          *neovide-setup-options*
+                                                          *evensong-setup-options*
 size        table    Floating UI size as a fraction of the editor.
 border      string   Border style passed to |nvim_open_win()|.
 backdrop    number   Dim level of the backdrop behind the UI (0-100).
 auto_apply  boolean  Apply changes live as you edit.
 data_path   string   Directory for settings.lua. Defaults to
-                     stdpath("data") .. "/neovide.nvim".
+                     stdpath("data") .. "/evensong".
 settings    table    Your own default overrides, keyed by setting key, e.g.
                      { theme = "dark", opacity = 0.95 }. These are applied on
                      startup and used as the baseline the persistence layer
                      compares against when deciding what to save.
-keys        table    Override any of the default keymaps (see |neovide-keymaps|).
+keys        table    Override any of the default keymaps (see |evensong-keymaps|).
 icons       table    Glyphs used in the UI. Top-level keys: bool_true,
                      bool_false, collapsed, expanded, modified, restart,
                      settings, profiles, help. `icons.category` is a map from
@@ -71,7 +71,7 @@ icons       table    Glyphs used in the UI. Top-level keys: bool_true,
                      plain text if you don't use a patched font.
 
 ==============================================================================
-4. COMMANDS                                                  *neovide-commands*
+4. COMMANDS                                                  *evensong-commands*
 
                                                                     *:Evensong*
 :Evensong [arg]         Open the settings UI. With no argument, opens the
@@ -83,15 +83,15 @@ icons       table    Glyphs used in the UI. Top-level keys: bool_true,
 
 Lua API: >
 
-    require("neovide").open([arg])
-    require("neovide").close()
-    require("neovide").toggle()
+    require("evensong").open([arg])
+    require("evensong").close()
+    require("evensong").toggle()
 <
 ==============================================================================
-5. KEYMAPS                                                    *neovide-keymaps*
+5. KEYMAPS                                                    *evensong-keymaps*
 
 Default keymaps active inside the settings UI. Most are configurable via the
-`keys` table in |neovide-setup|; the built-in motions j / k, gg / G, and
+`keys` table in |evensong-setup|; the built-in motions j / k, gg / G, and
 ]] / [[ are fixed and cannot be remapped through `keys`:
 
     <CR>          Activate the current row: fold a section, toggle a boolean,
@@ -121,16 +121,16 @@ Closing with q / <Esc> reverts every change you have not applied, back to how
 things were when the menu opened (or your last Apply).
 
 ==============================================================================
-6. PERSISTENCE                                            *neovide-persistence*
+6. PERSISTENCE                                            *evensong-persistence*
 
 Saved values are written to `data_path/settings.lua` and re-applied on the next
-startup by `require("neovide").setup()`. Only values that differ from your
+startup by `require("evensong").setup()`. Only values that differ from your
 effective default and pass validation are written, so junk never reaches disk.
 On apply, any value that fails validation is coerced to its registered default
 and reported once via |vim.notify()|.
 
 ==============================================================================
-7. DEVELOPMENT                                            *neovide-development*
+7. DEVELOPMENT                                            *evensong-development*
 
 Run the test suite (requires plenary.nvim on the runtimepath): >
 

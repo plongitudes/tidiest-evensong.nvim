@@ -1,4 +1,4 @@
-local fonts = require("neovide.fonts")
+local fonts = require("evensong.fonts")
 
 describe("fonts.list", function()
   local list = fonts.list()

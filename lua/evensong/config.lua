@@ -1,6 +1,6 @@
 local M = {}
 
----@class NeovideConfig
+---@class EvensongConfig
 M.defaults = {
   size = { width = 0.8, height = 0.8 },
   border = "rounded",
@@ -52,7 +52,7 @@ M.options = {}
 function M.setup(opts)
   M.options = vim.tbl_deep_extend("force", {}, M.defaults, opts or {})
   if not M.options.data_path then
-    M.options.data_path = vim.fn.stdpath("data") .. "/neovide.nvim"
+    M.options.data_path = vim.fn.stdpath("data") .. "/evensong"
   end
 end
 

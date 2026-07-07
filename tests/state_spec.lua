@@ -1,5 +1,5 @@
-local config = require("neovide.config")
-local State = require("neovide.state")
+local config = require("evensong.config")
+local State = require("evensong.state")
 
 describe("state dirty tracking", function()
   local tmpdir

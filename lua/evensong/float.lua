@@ -1,4 +1,4 @@
-local config = require("neovide.config")
+local config = require("evensong.config")
 
 local M = {}
 M.__index = M
@@ -15,7 +15,7 @@ function M.new(opts)
   self.backdrop_win = nil
   self.backdrop_buf = nil
   _instance = _instance + 1
-  self.augroup = vim.api.nvim_create_augroup("neovide_float_" .. _instance, { clear = true })
+  self.augroup = vim.api.nvim_create_augroup("evensong_float_" .. _instance, { clear = true })
   return self
 end
 
@@ -32,7 +32,7 @@ function M:open()
   vim.bo[self.buf].buftype = "nofile"
   vim.bo[self.buf].bufhidden = "wipe"
   vim.bo[self.buf].swapfile = false
-  vim.bo[self.buf].filetype = "neovide"
+  vim.bo[self.buf].filetype = "evensong"
 
   -- Calculate dimensions
   local win_config = self:_win_config()
@@ -44,7 +44,7 @@ function M:open()
   self.win = vim.api.nvim_open_win(self.buf, true, win_config)
 
   vim.wo[self.win].winhighlight =
-    "Normal:NeovideNormal,FloatBorder:NeovideBorder,WinBar:NeovideNormal,WinBarNC:NeovideNormal"
+    "Normal:EvensongNormal,FloatBorder:EvensongBorder,WinBar:EvensongNormal,WinBarNC:EvensongNormal"
   vim.wo[self.win].cursorline = true
   vim.wo[self.win].wrap = false
   vim.wo[self.win].signcolumn = "no"
@@ -124,7 +124,7 @@ function M:_create_backdrop(win_config)
     zindex = 49,
   })
 
-  vim.wo[self.backdrop_win].winhighlight = "Normal:NeovideBackdrop"
+  vim.wo[self.backdrop_win].winhighlight = "Normal:EvensongBackdrop"
   vim.wo[self.backdrop_win].winblend = cfg.backdrop
 end
 

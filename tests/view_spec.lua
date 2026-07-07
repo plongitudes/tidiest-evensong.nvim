@@ -1,7 +1,7 @@
-local config = require("neovide.config")
-local view = require("neovide.view")
-local registry = require("neovide.registry")
-local persistence = require("neovide.persistence")
+local config = require("evensong.config")
+local view = require("evensong.view")
+local registry = require("evensong.registry")
+local persistence = require("evensong.persistence")
 
 local function tmpdir()
   local d = vim.fn.tempname()
@@ -100,7 +100,7 @@ describe("view explicit-save model", function()
 end)
 
 describe("view Apply with a TOML setting", function()
-  local toml = require("neovide.toml")
+  local toml = require("evensong.toml")
   local config_path
 
   before_each(function()

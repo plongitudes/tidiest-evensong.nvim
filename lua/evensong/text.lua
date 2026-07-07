@@ -1,7 +1,7 @@
 local M = {}
 M.__index = M
 
-M.ns = vim.api.nvim_create_namespace("neovide.nvim")
+M.ns = vim.api.nvim_create_namespace("evensong")
 
 function M.new()
   local self = setmetatable({}, M)

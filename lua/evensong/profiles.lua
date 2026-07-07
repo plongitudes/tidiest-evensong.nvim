@@ -1,8 +1,8 @@
 local M = {}
 
-local config = require("neovide.config")
-local registry = require("neovide.registry")
-local util = require("neovide.util")
+local config = require("evensong.config")
+local registry = require("evensong.registry")
+local util = require("evensong.util")
 
 local function profiles_dir()
   return config.get().data_path .. "/profiles"
@@ -34,7 +34,7 @@ function M.load(name)
   end
   -- The file exists but could not be parsed (corrupt/truncated) — say so rather than
   -- reporting a missing profile.
-  vim.notify("neovide.nvim: could not read profile '" .. name .. "' (" .. path .. ")", vim.log.levels.WARN)
+  vim.notify("evensong: could not read profile '" .. name .. "' (" .. path .. ")", vim.log.levels.WARN)
   return nil
 end
 
@@ -62,7 +62,7 @@ function M.save(name, settings, desc)
   local content = "return " .. vim.inspect(profile) .. "\n"
   local ok, err = util.write_atomic(path, content)
   if not ok then
-    vim.notify("neovide.nvim: failed to save profile '" .. name .. "': " .. tostring(err), vim.log.levels.WARN)
+    vim.notify("evensong: failed to save profile '" .. name .. "': " .. tostring(err), vim.log.levels.WARN)
   end
 end
 
@@ -85,7 +85,7 @@ function M.apply(profile)
     end
   end
   if #coerced > 0 then
-    vim.notify("neovide.nvim: ignored invalid profile value(s): " .. table.concat(coerced, ", "), vim.log.levels.WARN)
+    vim.notify("evensong: ignored invalid profile value(s): " .. table.concat(coerced, ", "), vim.log.levels.WARN)
   end
 end
 

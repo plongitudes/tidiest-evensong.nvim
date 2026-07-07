@@ -1,5 +1,5 @@
-local config = require("neovide.config")
-local profiles = require("neovide.profiles")
+local config = require("evensong.config")
+local profiles = require("evensong.profiles")
 
 local function write_file(path, content)
   local f = assert(io.open(path, "w"))

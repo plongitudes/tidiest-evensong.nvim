@@ -1,4 +1,4 @@
-local util = require("neovide.util")
+local util = require("evensong.util")
 
 describe("util.round", function()
   it("rounds half away from zero, symmetrically for negatives", function()

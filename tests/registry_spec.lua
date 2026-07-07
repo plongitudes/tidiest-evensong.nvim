@@ -1,4 +1,4 @@
-local registry = require("neovide.registry")
+local registry = require("evensong.registry")
 
 describe("registry.is_valid", function()
   local theme = registry.get("theme")

@@ -1,6 +1,6 @@
 local M = {}
 
-local platform = require("neovide.platform")
+local platform = require("evensong.platform")
 
 function M.config_path()
   local env = vim.env.NEOVIDE_CONFIG
@@ -151,7 +151,7 @@ end
 -- is unchanged, so a file the plugin never modifies stays byte-for-byte intact.
 function M.write(path, data)
   path = path or M.config_path()
-  local float_keys = require("neovide.registry").float_toml_keys()
+  local float_keys = require("evensong.registry").float_toml_keys()
 
   local lines = {}
 
@@ -182,9 +182,9 @@ function M.write(path, data)
   end
 
   local content = table.concat(lines, "\n") .. "\n"
-  local ok, err = require("neovide.util").write_atomic(path, content)
+  local ok, err = require("evensong.util").write_atomic(path, content)
   if not ok then
-    vim.notify("neovide.nvim: failed to write " .. path .. ": " .. tostring(err), vim.log.levels.WARN)
+    vim.notify("evensong: failed to write " .. path .. ": " .. tostring(err), vim.log.levels.WARN)
   end
 end
 
@@ -255,7 +255,7 @@ function M.set(key_path, value)
   -- Skip the whole-file (comment-stripping) rewrite when the on-disk value already
   -- matches. This is what keeps an untouched config.toml intact and stops
   -- apply_saved from rewriting the file on every launch for unchanged toml_* keys.
-  if require("neovide.util").deep_equals(node[last], value) then
+  if require("evensong.util").deep_equals(node[last], value) then
     return
   end
   node[last] = value
