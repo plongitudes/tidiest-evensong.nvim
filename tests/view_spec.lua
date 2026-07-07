@@ -13,11 +13,13 @@ describe("view explicit-save model", function()
   before_each(function()
     config.setup({ data_path = tmpdir() })
     vim.g.neovide_opacity = nil
+    vim.g.neovide_window_blurred = nil
   end)
 
   after_each(function()
     view.close()
     vim.g.neovide_opacity = nil
+    vim.g.neovide_window_blurred = nil
   end)
 
   it("applies changes live while the menu is open", function()
@@ -39,6 +41,21 @@ describe("view explicit-save model", function()
     view._set_value(registry.get("opacity"), 0.5)
     view.open("Display") -- reopen while dirty (e.g. :Neovide Display)
     assert.are.equal(1.0, vim.g.neovide_opacity) -- preview reverted, not adopted
+  end)
+
+  -- T4: revert must restore the *applied baseline*, not setting.default, and handle
+  -- more than one dirty key.
+  it("reverts multiple dirty keys to the applied baseline, not factory default", function()
+    view.open()
+    view._set_value(registry.get("opacity"), 0.7)
+    view._save_all() -- baseline: opacity = 0.7 (a non-factory value)
+
+    view._set_value(registry.get("opacity"), 0.3)
+    view._set_value(registry.get("window_blurred"), true)
+    view.close() -- discard both unsaved changes
+
+    assert.are.equal(0.7, vim.g.neovide_opacity) -- applied baseline, NOT factory 1.0
+    assert.are.equal(false, vim.g.neovide_window_blurred) -- reverted to its baseline
   end)
 
   it("persists changes on Apply and keeps them applied", function()

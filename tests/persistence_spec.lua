@@ -54,6 +54,21 @@ describe("persistence with a dirty state file", function()
     assert.are.equal("dark", saved.theme)
   end)
 
+  it("writes an empty table when every value equals its default (T2)", function()
+    -- Guards the save-elision: a dropped deep_equals would write every default to disk
+    -- yet still pass the positive save tests.
+    persistence.save({ theme = "auto", opacity = 1.0 })
+    assert.are.same({}, persistence.load())
+  end)
+
+  it("elides against a user-declared default, persists a differing value (T3)", function()
+    config.setup({ data_path = tmpdir, settings = { opacity = 0.9 } })
+    persistence.save({ opacity = 0.9 }) -- equals the user default -> not written
+    assert.is_nil(persistence.load().opacity)
+    persistence.save({ opacity = 0.5 }) -- differs from the user default -> written
+    assert.are.equal(0.5, persistence.load().opacity)
+  end)
+
   it("returns an empty table instead of throwing on a corrupt settings.lua", function()
     write_file(settings_path, "return {\n") -- truncated / syntax error
     local data
