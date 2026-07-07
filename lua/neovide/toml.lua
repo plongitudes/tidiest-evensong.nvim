@@ -74,7 +74,7 @@ function M.read(path)
     -- Key = value
     local key, raw_value = trimmed:match("^([%w_%-]+)%s*=%s*(.+)$")
     if key and raw_value then
-      local value = M._parse_value(raw_value)
+      local value = M._parse_value(M._strip_comment(raw_value))
       if current_section then
         local keys = vim.split(current_section, ".", { plain = true })
         local node = data
@@ -94,6 +94,24 @@ function M.read(path)
   end
 
   return data
+end
+
+-- Strip a trailing inline `# comment` from a raw value, but leave a `#` that is
+-- inside a quoted string intact (e.g. title = "a # b"). Simple quote tracking, in
+-- keeping with the rest of this minimal parser (no escaped-quote handling).
+function M._strip_comment(raw)
+  local in_single, in_double = false, false
+  for i = 1, #raw do
+    local c = raw:sub(i, i)
+    if c == '"' and not in_single then
+      in_double = not in_double
+    elseif c == "'" and not in_double then
+      in_single = not in_single
+    elseif c == "#" and not in_single and not in_double then
+      return (raw:sub(1, i - 1):gsub("%s+$", ""))
+    end
+  end
+  return raw
 end
 
 function M._parse_value(raw)

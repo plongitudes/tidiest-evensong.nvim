@@ -49,6 +49,18 @@ describe("toml writer", function()
     assert.are.equal(false, toml.read().vsync)
   end)
 
+  it("strips an unquoted trailing comment from a value", function()
+    write_file(config_path, 'frame = "full"  # a note\nsize = 14  # pt\n')
+    local data = toml.read()
+    assert.are.equal("full", data.frame)
+    assert.are.equal(14, data.size)
+  end)
+
+  it("keeps a # that is inside a quoted string", function()
+    write_file(config_path, 'title = "a # b"\n')
+    assert.are.equal("a # b", toml.read().title)
+  end)
+
   it("overwrites a stale line when set to a value that differs from disk", function()
     -- H6: resetting a toml key back to its default must overwrite the stored value,
     -- not be skipped. font.size default is 14.0; disk holds a non-default 18.0.
