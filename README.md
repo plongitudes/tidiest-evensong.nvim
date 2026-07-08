@@ -27,7 +27,7 @@ But really, none of that is even mildly relevant, unless you feel that having a 
 ## Requirements
 
 - Neovim >= 0.10 (uses `vim.uv`).
-- Running inside **Neovide** for settings to actually apply (the UI opens anywhere, but `M.setup()` only re-applies persisted settings when `require("evensong.platform").is_neovide()`).
+- Running inside **Neovide** — Evensong is Neovide-only. In plain Neovim it loads as a no-op: the `:Evensong` command isn't created and nothing is applied.
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) — only for running the test suite.
 
 ## Installation
@@ -37,9 +37,6 @@ But really, none of that is even mildly relevant, unless you feel that having a 
 ```lua
 {
   "plongitudes/tidiest-evensong.nvim",
-  lazy = true,
-  event = { "UIEnter" },
-  cond = vim.g.neovide ~= nil,
   main = "evensong",
   opts = {},
 }
