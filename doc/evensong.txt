@@ -32,9 +32,8 @@ avoids startup errors of the form: >
 2. REQUIREMENTS                                          *evensong-requirements*
 
 - Neovim >= 0.10 (uses |vim.uv|).
-- Running inside Neovide for settings to actually apply. The UI opens in any
-  Neovim instance, but persisted settings are only re-applied on startup when
-  running under Neovide.
+- Running inside Neovide. Evensong is Neovide-only: in plain Neovim it loads as
+  a no-op — the :Evensong command is not created and nothing is applied.
 - plenary.nvim, for running the test suite only.
 
 ==============================================================================

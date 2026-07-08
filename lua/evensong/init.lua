@@ -4,13 +4,15 @@ local config = require("evensong.config")
 local colors = require("evensong.colors")
 
 function M.setup(opts)
+  -- Neovide-only: skip all setup (config, highlights, persistence) in plain Neovim so
+  -- loading the plugin there is a genuine no-op.
+  if not require("evensong.platform").is_neovide() then
+    return
+  end
   config.setup(opts)
   colors.setup()
   colors.register_autocmd()
-
-  if require("evensong.platform").is_neovide() then
-    require("evensong.persistence").apply_saved()
-  end
+  require("evensong.persistence").apply_saved()
 end
 
 function M.open(arg)
