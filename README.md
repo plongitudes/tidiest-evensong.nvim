@@ -23,12 +23,23 @@ But really, none of that is even mildly relevant, unless you feel that having a 
 - Persistence to `stdpath("data")/evensong/settings.lua`, re-applied on startup.
 - Named profiles you can save and re-apply.
 - Reads a subset of settings from Neovide's startup `config.toml`.
+- Version-drift banner in the header: the settings list is hand-maintained and pinned to a Neovide release (Neovide exposes no way to discover its settings at runtime), so the UI shows green when your Neovide matches that version (or is older) and a yellow caution when your Neovide is newer and may have settings not listed yet.
 
 ## Requirements
 
 - Neovim >= 0.10 (uses `vim.uv`).
 - Running inside **Neovide** — Evensong is Neovide-only. In plain Neovim it loads as a no-op: the `:Evensong` command isn't created and nothing is applied.
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) — only for running the test suite.
+
+## Compatibility
+
+Neovide exposes no way to discover its settings at runtime, so Evensong's settings list is hand-maintained and pinned to a Neovide release.
+
+| Evensong | Reconciled against Neovide |
+|----------|----------------------------|
+| 0.1.0    | 0.16.0                     |
+
+A newer Neovide still works — the UI header shows a drift banner noting it may expose settings this version doesn't list yet.
 
 ## Installation
 
@@ -38,9 +49,16 @@ But really, none of that is even mildly relevant, unless you feel that having a 
 {
   "plongitudes/tidiest-evensong.nvim",
   main = "evensong",
+  lazy = false,
   opts = {},
 }
 ```
+
+`lazy = false` keeps saved settings re-applying at startup, and is **required** if your
+lazy.nvim setup uses `defaults = { lazy = true }` — without a load trigger the plugin
+never loads, so `:Evensong` is never registered. (If you only want the command and don't
+need startup re-apply, `cmd = "Evensong"` works too.) Loading Evensong outside Neovide is
+a no-op, so there's nothing to defer.
 
 ### [packer.nvim](https://github.com/wbthomason/packer.nvim)
 

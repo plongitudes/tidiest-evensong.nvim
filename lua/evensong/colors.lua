@@ -26,6 +26,8 @@ M.highlights = {
   EvensongDimmed = { link = "Conceal", default = true },
   EvensongProfileName = { link = "Title", default = true },
   EvensongProfileActive = { link = "DiagnosticOk", default = true },
+  EvensongVersionSynced = { link = "DiagnosticOk", default = true },
+  EvensongVersionDrift = { link = "DiagnosticWarn", default = true },
   EvensongBackdrop = { bg = "#000000", default = true },
 }
 

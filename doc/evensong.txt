@@ -28,6 +28,16 @@ avoids startup errors of the form: >
 
     Setting Theme expected one of auto, dark, light, bg_color, but received ""
 <
+                                                    *evensong-version-drift*
+The list of settings Evensong knows about is hand-maintained and pinned to a
+specific Neovide release (`registry.built_against`); Neovide provides no way to
+discover its settings at runtime. The UI header shows a banner comparing your
+running Neovide to that pinned version: green ("in sync") when they match or
+your Neovide is older, and yellow ("drift") when your Neovide is newer — a gentle
+caution that it may have settings this plugin does not list yet. Unknown Neovide
+versions show a neutral banner. Newly released settings are added by updating the
+registry, not discovered automatically.
+
 ==============================================================================
 2. REQUIREMENTS                                          *evensong-requirements*
 
@@ -165,6 +175,8 @@ plugin, for example: >
     EvensongDimmed               Conceal
     EvensongProfileName          Title
     EvensongProfileActive        DiagnosticOk
+    EvensongVersionSynced        DiagnosticOk
+    EvensongVersionDrift         DiagnosticWarn
     EvensongBackdrop             (opaque black background; not linked)
 
 ==============================================================================

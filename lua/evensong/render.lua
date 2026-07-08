@@ -2,6 +2,7 @@ local Text = require("evensong.text")
 local config = require("evensong.config")
 local registry = require("evensong.registry")
 local platform_mod = require("evensong.platform")
+local version = require("evensong.version")
 local util = require("evensong.util")
 
 local M = {}
@@ -91,8 +92,35 @@ function M._header(text, state)
 
   M._push_loc("header")
   text:nl()
+
+  M._version_banner(text)
+
   text:nl()
   M._push_loc("blank")
+end
+
+-- One-line banner comparing the running Neovide to the version the registry was built against,
+-- so the user is gently warned when a newer Neovide might expose settings this plugin doesn't
+-- list yet. Emits exactly one line (append → push → nl) to keep the row/location mapping aligned.
+function M._version_banner(text)
+  local status = version.status()
+  text:append("  ", "EvensongNormal")
+  if status.state == "synced" then
+    text:append("✓ Neovide " .. status.running .. " · in sync", "EvensongVersionSynced")
+  elseif status.state == "drift" then
+    text:append(
+      "⚠ Neovide "
+        .. status.running
+        .. " · built against "
+        .. status.built
+        .. " — newer Neovide may have settings not shown here",
+      "EvensongVersionDrift"
+    )
+  else
+    text:append("Neovide version unknown", "EvensongDimmed")
+  end
+  M._push_loc("header")
+  text:nl()
 end
 
 function M._settings(text, state)
@@ -360,6 +388,16 @@ function M._help(text)
     text:append("    ", "EvensongNormal")
     text:append(string.format("%-11s", "(not set)"), "EvensongDimmed")
     text:append("  no value assigned", "EvensongDimmed")
+  end)
+  raw(function()
+    text:append("    ", "EvensongNormal")
+    text:append(string.format("%-11s", "✓ in sync"), "EvensongVersionSynced")
+    text:append("  your Neovide matches the version this plugin was built against", "EvensongDimmed")
+  end)
+  raw(function()
+    text:append("    ", "EvensongNormal")
+    text:append(string.format("%-11s", "⚠ drift"), "EvensongVersionDrift")
+    text:append("  newer Neovide — some settings may not be shown here", "EvensongDimmed")
   end)
   blank()
 

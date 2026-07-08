@@ -2,6 +2,24 @@ local platform = require("evensong.platform")
 
 local M = {}
 
+-- The Neovide version whose settings surface this registry mirrors. Bump this whenever you
+-- reconcile M.settings against a new Neovide release. The UI compares it to the running
+-- Neovide (see evensong.version) and shows a drift banner when the running build is newer.
+M.built_against = "0.16.0"
+
+-- Deliberately NOT exposed, though registered in Neovide's Rust source: these are
+-- internal/dev/deprecated toggles that don't belong in a user settings picker. Listed here so
+-- a future reconciler knows the omission was intentional:
+--   neovide_debug_renderer, neovide_observed_lines, neovide_observed_columns,
+--   neovide_mouse_move_event, neovide_iso_layout, neovide_cursor_hack,
+--   neovide_has_mouse_grid_detection, neovide_input_macos_alt_is_meta (deprecated; superseded
+--   by input_macos_option_key_is_meta below).
+-- Deferred pending source verification of its exact enum choice strings + default:
+--   neovide_pixel_geometry.
+-- Known default drifts from current source, left unchanged to avoid altering established
+-- behavior — review before the next reconciliation: floating_blur_amount_x/y (source 2.0),
+-- cursor_animation_length (source 0.150), cursor_vfx_particle_lifetime (source 0.5).
+
 ---@class EvensongSetting
 ---@field key string
 ---@field display_name string
@@ -185,6 +203,19 @@ M.settings = {
     step = 1,
     source = "vim_option",
     vim_option = "linespace",
+  },
+  {
+    key = "underline_stroke_scale",
+    display_name = "Underline Stroke Scale",
+    description = "Thickness multiplier for underlines (clamped to at least 1.0)",
+    category = "Display",
+    type = "float",
+    default = 1.0,
+    min = 1.0,
+    max = 5.0,
+    step = 0.1,
+    source = "runtime",
+    var_name = "neovide_underline_stroke_scale",
   },
 
   -- ══════════════════════════════════════════
@@ -404,6 +435,29 @@ M.settings = {
     source = "runtime",
     var_name = "neovide_cursor_smooth_blink",
   },
+  {
+    key = "cursor_short_animation_length",
+    display_name = "Short Anim Length",
+    description = "Duration of short-distance cursor movement animation (seconds)",
+    category = "Cursor",
+    type = "float",
+    default = 0.04,
+    min = 0.0,
+    max = 1.0,
+    step = 0.01,
+    source = "runtime",
+    var_name = "neovide_cursor_short_animation_length",
+  },
+  {
+    key = "cursor_cell_color_fallback",
+    display_name = "Cell Color Fallback",
+    description = "Fall back to cell colors for the cursor when no cursor color is set",
+    category = "Cursor",
+    type = "boolean",
+    default = false,
+    source = "runtime",
+    var_name = "neovide_cursor_cell_color_fallback",
+  },
 
   -- ══════════════════════════════════════════
   -- Cursor VFX
@@ -497,6 +551,19 @@ M.settings = {
     source = "runtime",
     var_name = "neovide_cursor_vfx_particle_curl",
   },
+  {
+    key = "cursor_vfx_particle_highlight_lifetime",
+    display_name = "Highlight Lifetime",
+    description = "How long highlighted VFX particles live (seconds)",
+    category = "Cursor VFX",
+    type = "float",
+    default = 0.2,
+    min = 0.0,
+    max = 5.0,
+    step = 0.1,
+    source = "runtime",
+    var_name = "neovide_cursor_vfx_particle_highlight_lifetime",
+  },
 
   -- ══════════════════════════════════════════
   -- Input
@@ -558,6 +625,16 @@ M.settings = {
     source = "runtime",
     var_name = "neovide_input_macos_option_key_is_meta",
     platform = "macos",
+  },
+  {
+    key = "message_area_drag_selection",
+    display_name = "Msg Area Drag Select",
+    description = "Allow click-and-drag text selection in the message area",
+    category = "Input",
+    type = "boolean",
+    default = false,
+    source = "runtime",
+    var_name = "neovide_message_area_drag_selection",
   },
 
   -- ══════════════════════════════════════════
@@ -628,13 +705,13 @@ M.settings = {
   {
     key = "show_border",
     display_name = "Show Border",
-    description = "Show window border",
+    description = "Show window border (effect is macOS-only)",
     category = "Window",
     type = "boolean",
     default = true,
     source = "runtime",
     var_name = "neovide_show_border",
-    platform = "windows",
+    platform = "macos",
   },
   {
     key = "unlink_border_highlights",
@@ -645,6 +722,50 @@ M.settings = {
     default = false,
     source = "runtime",
     var_name = "neovide_unlink_border_highlights",
+  },
+  {
+    key = "remember_window_position",
+    display_name = "Remember Position",
+    description = "Remember and restore window position across sessions",
+    category = "Window",
+    type = "boolean",
+    default = true,
+    source = "runtime",
+    var_name = "neovide_remember_window_position",
+  },
+  {
+    key = "macos_simple_fullscreen",
+    display_name = "Simple Fullscreen",
+    description = "Use the non-native (simple) fullscreen mode on macOS",
+    category = "Window",
+    type = "boolean",
+    default = false,
+    source = "runtime",
+    var_name = "neovide_macos_simple_fullscreen",
+    platform = "macos",
+  },
+  {
+    key = "highlight_matching_pair",
+    display_name = "Highlight Matching Pair",
+    description = "Highlight the matching bracket/pair under the cursor",
+    category = "Window",
+    type = "boolean",
+    default = false,
+    source = "runtime",
+    var_name = "neovide_highlight_matching_pair",
+    platform = "macos",
+  },
+  {
+    key = "corner_preference",
+    display_name = "Corner Preference",
+    description = "Window corner rounding preference",
+    category = "Window",
+    type = "enum",
+    default = "default",
+    choices = { "default", "round", "round_small", "do_not_round" },
+    source = "runtime",
+    var_name = "neovide_corner_preference",
+    platform = "windows",
   },
 
   -- ══════════════════════════════════════════
@@ -708,8 +829,7 @@ M.settings = {
     type = "boolean",
     default = true,
     source = "runtime",
-    var_name = "neovide_progress_bar",
-    nightly = true,
+    var_name = "neovide_progress_bar_enabled",
   },
   {
     key = "progress_bar_height",
@@ -717,13 +837,12 @@ M.settings = {
     description = "Height of the progress bar in pixels",
     category = "Progress Bar",
     type = "integer",
-    default = 2,
+    default = 3,
     min = 1,
     max = 20,
     step = 1,
     source = "runtime",
     var_name = "neovide_progress_bar_height",
-    nightly = true,
   },
   {
     key = "progress_bar_speed",
@@ -731,13 +850,12 @@ M.settings = {
     description = "Animation speed of the progress bar",
     category = "Progress Bar",
     type = "float",
-    default = 1.0,
-    min = 0.1,
-    max = 5.0,
-    step = 0.1,
+    default = 100.0,
+    min = 0.0,
+    max = 300.0,
+    step = 10.0,
     source = "runtime",
-    var_name = "neovide_progress_bar_speed",
-    nightly = true,
+    var_name = "neovide_progress_bar_animation_speed",
   },
   {
     key = "progress_bar_hide_delay",
@@ -751,7 +869,6 @@ M.settings = {
     step = 0.1,
     source = "runtime",
     var_name = "neovide_progress_bar_hide_delay",
-    nightly = true,
   },
 
   -- ══════════════════════════════════════════

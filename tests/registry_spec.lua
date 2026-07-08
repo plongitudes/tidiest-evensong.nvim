@@ -50,6 +50,25 @@ describe("registry theme choices", function()
   end)
 end)
 
+describe("registry reconciled variable names", function()
+  -- These entries previously wrote to globals Neovide ignores, so the settings did nothing.
+  -- Guard the corrected names against regression (see registry.built_against reconciliation).
+  it("uses Neovide's real progress-bar globals", function()
+    assert.are.equal("neovide_progress_bar_enabled", registry.get("progress_bar").var_name)
+    assert.are.equal("neovide_progress_bar_animation_speed", registry.get("progress_bar_speed").var_name)
+  end)
+
+  it("gates show_border to macOS, where it actually has an effect", function()
+    assert.are.equal("macos", registry.get("show_border").platform)
+  end)
+
+  it("no longer mislabels the (now stable) progress bar as nightly", function()
+    for _, key in ipairs({ "progress_bar", "progress_bar_height", "progress_bar_speed", "progress_bar_hide_delay" }) do
+      assert.is_nil(registry.get(key).nightly)
+    end
+  end)
+end)
+
 describe("registry.read_value capture", function()
   local theme = registry.get("theme")
   local vfx = registry.get("cursor_vfx_mode")
