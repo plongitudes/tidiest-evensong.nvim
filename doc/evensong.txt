@@ -38,6 +38,9 @@ caution that it may have settings this plugin does not list yet. Unknown Neovide
 versions show a neutral banner. Newly released settings are added by updating the
 registry, not discovered automatically.
 
+The comparison uses major.minor only. Neovide introduces settings in minor
+releases, so a patch bump (0.16.2 against a 0.16.0 pin) is not drift.
+
 ==============================================================================
 2. REQUIREMENTS                                          *evensong-requirements*
 

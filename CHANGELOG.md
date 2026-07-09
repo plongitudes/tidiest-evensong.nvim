@@ -12,7 +12,9 @@ registry in step with new Neovide releases.
 
 ## [0.1.0] - 2026-07-08
 
-Settings registry reconciled against **Neovide 0.16.0**.
+Settings registry reconciled against **Neovide 0.16.2**. (The source-vs-docs reconciliation was
+performed against 0.16.0; 0.16.1 and 0.16.2 were verified by diff to change no `SettingGroup`
+field, no TOML key, and no setting name.)
 
 ### Added
 
@@ -21,8 +23,11 @@ Settings registry reconciled against **Neovide 0.16.0**.
   header now compares your running Neovide to `registry.built_against` and shows: green
   ("in sync") when they match or your Neovide is older, yellow ("drift") when your Neovide is
   newer and may have settings not listed yet, and a neutral banner when the version is unknown.
+  Drift is judged on **major.minor only** — Neovide introduces settings in minor releases, so a
+  patch bump (e.g. 0.16.2 against a 0.16.0 pin) is not drift and stays green.
 - `evensong.version` module — semver parse/compare and drift `status()`.
-- `registry.built_against` — the Neovide version the registry mirrors (currently `0.16.0`).
+- `version.plugin` — Evensong's own version, pairing with `registry.built_against`.
+- `registry.built_against` — the Neovide version the registry mirrors (currently `0.16.2`).
 - Eight settings that current Neovide exposes but Evensong did not list:
   `underline_stroke_scale`, `cursor_short_animation_length`, `cursor_cell_color_fallback`,
   `cursor_vfx_particle_highlight_lifetime`, `message_area_drag_selection`,

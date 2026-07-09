@@ -37,9 +37,9 @@ Neovide exposes no way to discover its settings at runtime, so Evensong's settin
 
 | Evensong | Reconciled against Neovide |
 |----------|----------------------------|
-| 0.1.0    | 0.16.0                     |
+| 0.1.0    | 0.16.2                     |
 
-A newer Neovide still works — the UI header shows a drift banner noting it may expose settings this version doesn't list yet.
+A newer Neovide still works — the UI header shows a drift banner noting it may expose settings this version doesn't list yet. Drift is judged on major.minor, since Neovide introduces settings in minor releases; a patch bump is not drift.
 
 ## Installation
 

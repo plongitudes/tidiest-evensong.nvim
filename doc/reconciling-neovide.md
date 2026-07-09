@@ -90,6 +90,19 @@ be sure to look in new places once in a while to make sure you're not missing so
    reconciled against. That is the entire drift-banner update — `lua/evensong/version.lua`
    compares it to the running `g:neovide_version` and the header renders green/yellow/neutral
    automatically. No other banner code changes.
+
+   The banner compares **major.minor only**, so you do not need to bump the pin for a patch
+   release. You may still bump it to a patch you've *verified*, which is cheap — a patch
+   release rarely touches settings, and a file-list diff proves it in one command:
+
+   ```bash
+   gh api repos/neovide/neovide/compare/<old>...<new> --jq '.files[].filename'
+   ```
+
+   If none of the source files listed above appear, no setting changed and the mirror holds.
+   (This is how `0.16.0` was carried forward to `0.16.2`: 29 files changed, but
+   `src/window/settings.rs` and `src/settings/config.rs` were untouched, and the sole
+   `configuration.md` edit was a wording fix.)
 8. **Update `CHANGELOG.md`** — a new section noting the Neovide version, what was added/fixed,
    and refreshed exclusion/deferral/known-drift notes.
 9. **Verify** (see below).

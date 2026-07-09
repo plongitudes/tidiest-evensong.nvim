@@ -7,6 +7,9 @@
 --   * synced  — running Neovide is the same or older; every setting we list is accounted for.
 --   * drift   — running Neovide is NEWER; it may expose settings this plugin doesn't know about.
 --   * unknown — running version couldn't be determined; stay neutral, never cry wolf.
+--
+-- Comparison is on major.minor only: Neovide ships new settings in minor releases, so a patch
+-- bump is not drift.
 
 local platform = require("evensong.platform")
 local registry = require("evensong.registry")
@@ -60,8 +63,13 @@ function M.status()
     return { state = "unknown", running = running, built = built }
   end
 
+  -- Compare on major.minor only. Neovide introduces settings in minor releases; patch releases
+  -- are bugfixes. Counting a patch bump as drift would cry wolf on every 0.x.N.
+  local running_minor = { rv[1], rv[2], 0 }
+  local built_minor = { bv[1], bv[2], 0 }
+
   -- Running newer than what we mirror => there may be settings we don't expose yet.
-  local state = M.compare(rv, bv) > 0 and "drift" or "synced"
+  local state = M.compare(running_minor, built_minor) > 0 and "drift" or "synced"
   return { state = state, running = running, built = built }
 end
 

@@ -5,7 +5,11 @@ local M = {}
 -- The Neovide version whose settings surface this registry mirrors. Bump this whenever you
 -- reconcile M.settings against a new Neovide release. The UI compares it to the running
 -- Neovide (see evensong.version) and shows a drift banner when the running build is newer.
-M.built_against = "0.16.0"
+--
+-- The source-vs-docs reconciliation was done against 0.16.0; 0.16.1 and 0.16.2 were verified
+-- by diff to change no SettingGroup field, no TOML key, and no setting name, so the mirror
+-- holds through 0.16.2.
+M.built_against = "0.16.2"
 
 -- Deliberately NOT exposed, though registered in Neovide's Rust source: these are
 -- internal/dev/deprecated toggles that don't belong in a user settings picker. Listed here so

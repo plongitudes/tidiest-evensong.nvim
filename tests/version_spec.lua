@@ -64,6 +64,18 @@ describe("version.status", function()
     assert.are.equal(registry.built_against, s.built)
   end)
 
+  it("ignores patch bumps -- settings land in minor releases, so a patch is not drift", function()
+    local built = version.parse(registry.built_against)
+    vim.g.neovide_version = ("%d.%d.99"):format(built[1], built[2])
+    assert.are.equal("synced", version.status().state)
+  end)
+
+  it("still reports drift on a minor bump", function()
+    local built = version.parse(registry.built_against)
+    vim.g.neovide_version = ("%d.%d.0"):format(built[1], built[2] + 1)
+    assert.are.equal("drift", version.status().state)
+  end)
+
   it("reports unknown when the running version is absent or unparseable", function()
     vim.g.neovide_version = nil
     assert.are.equal("unknown", version.status().state)
